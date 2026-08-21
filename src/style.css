@@ -1,0 +1,169 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #1a1a2e;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Formulário */
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.campo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.campo input {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: #4f6ef7;
+}
+
+.acoes-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Botões */
+button {
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+button:hover { opacity: 0.85; }
+
+#btn-salvar {
+  background: #4f6ef7;
+  color: #fff;
+}
+
+#btn-cancelar {
+  background: #e0e0e0;
+  color: #444;
+}
+
+.btn-editar {
+  background: #f0a500;
+  color: #fff;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.btn-deletar {
+  background: #e84545;
+  color: #fff;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+/* Tabela */
+.tabela-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+thead tr {
+  background: #f7f8fc;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  font-weight: 700;
+  color: #555;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+tbody tr:hover {
+  background: #fafbff;
+}
+
+td.vazio {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+}
+
+/* Feedback */
+.feedback {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.feedback.sucesso {
+  background: #e6f9ed;
+  color: #2a7a4b;
+  border: 1px solid #b2dfc5;
+}
+
+.feedback.erro {
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid #f5b7b1;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD Usuários</title>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Gerenciamento de Usuários</h1>
+
+      <!-- Feedback -->
+      <div id="feedback" style="display:none;"></div>
+
+      <!-- Formulário -->
+      <section class="card">
+        <h2 id="titulo-form">Novo Usuário</h2>
+        <form id="form-usuario">
+          <input type="hidden" id="input-id" />
+
+          <div class="campo">
+            <label for="input-nome">Nome</label>
+            <input type="text" id="input-nome" placeholder="Nome completo" required />
+          </div>
+
+          <div class="campo">
+            <label for="input-email">E-mail</label>
+            <input type="email" id="input-email" placeholder="email@exemplo.com" required />
+          </div>
+
+          <div class="campo">
+            <label for="input-senha">Senha</label>
+            <input type="password" id="input-senha" placeholder="Senha" required />
+          </div>
+
+          <div class="acoes-form">
+            <button type="submit" id="btn-salvar">Salvar</button>
+            <button type="button" id="btn-cancelar" style="display:none;">Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Tabela -->
+      <section class="card">
+        <h2>Usuários Cadastrados</h2>
+        <div class="tabela-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
