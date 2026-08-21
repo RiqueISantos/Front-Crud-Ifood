@@ -30,6 +30,10 @@ export const UsuarioController = {
         await UsuarioModel.atualizar(dados.id, payload);
         UsuarioView.mostrarMensagem('Usuário atualizado com sucesso!');
       } else {
+        if (!dados.senha) {
+          UsuarioView.mostrarErro('Senha é obrigatória para criar um usuário.');
+          return;
+        }
         await UsuarioModel.criar({ nome: dados.nome, email: dados.email, senha: dados.senha });
         UsuarioView.mostrarMensagem('Usuário criado com sucesso!');
       }
