@@ -78,18 +78,18 @@ export function isAuthenticated() {
 
 /**
  * Cadastra um novo usuário.
- * @param {{ nome: string, email: string, senha: string, telefone: string, provedor_auth?: string }} data
+ * @param {{ nome: string, email: string, telefone: string }} data
  */
 export async function apiRegister(data) {
-  return request('/usuarios/cadastro', {
+  return request('/usuarios/', {
     method: 'POST',
     body: JSON.stringify(data),
   })
 }
 
 /**
- * Autentica um usuário e salva o token JWT.
- * @param {{ email: string, senha: string }} data
+ * Autentica um usuário via código OTP e salva o token JWT.
+ * @param {{ identificador: string, codigo: string, canal?: string }} data
  */
 export async function apiLogin(data) {
   const result = await request('/usuarios/login', {
@@ -103,29 +103,42 @@ export async function apiLogin(data) {
 }
 
 /**
- * Busca dados de um usuário pelo e-mail (rota pública).
- * @param {string} email
+ * Solicita o envio de código OTP para login.
+ * @param {{ identificador: string, canal?: string }} data
  */
-export async function apiGetUser(email) {
-  return request(`/usuarios/consultar/${encodeURIComponent(email)}`)
+export async function apiRequestLoginCode(data) {
+  return request('/usuarios/login/solicitar', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
 }
 
 /**
- * Deleta a conta do usuário autenticado.
- * Requer token JWT válido.
+ * Busca dados de um usuário pelo ID.
+ * @param {number} id
  */
-export async function apiDeleteAccount() {
-  const result = await request('/usuarios/deletar', { method: 'DELETE' })
+export async function apiGetUser(id) {
+  return request(`/usuarios/${id}`)
+}
+
+/**
+ * Deleta a conta do usuário autenticado pelo ID.
+ * Requer token JWT válido.
+ * @param {number} id
+ */
+export async function apiDeleteAccount(id) {
+  const result = await request(`/usuarios/${id}`, { method: 'DELETE' })
   clearToken()
   return result
 }
 
 /**
- * Atualiza dados do usuário autenticado.
- * @param {{ nome?: string, telefone?: string, senha?: string }} data
+ * Atualiza dados do usuário autenticado pelo ID.
+ * @param {number} id
+ * @param {{ nome?: string, telefone?: string }} data
  */
-export async function apiUpdateUser(data) {
-  return request('/usuarios/alterar', {
+export async function apiUpdateUser(id, data) {
+  return request(`/usuarios/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
@@ -138,7 +151,7 @@ export async function apiUpdateUser(data) {
  * @param {string} telefone - apenas dígitos com DDD, sem +55
  */
 export async function apiSendSms(telefone) {
-  return request('/usuarios/sms/enviar-numero', {
+  return request('/usuarios/sms/enviar', {
     method: 'POST',
     body: JSON.stringify({ telefone }),
   })
@@ -150,7 +163,7 @@ export async function apiSendSms(telefone) {
  * @param {string} codigo - 6 dígitos
  */
 export async function apiVerifySms(telefone, codigo) {
-  return request('/usuarios/sms/verificar-numero', {
+  return request('/usuarios/sms/verificar', {
     method: 'POST',
     body: JSON.stringify({ telefone, codigo }),
   })
@@ -159,32 +172,24 @@ export async function apiVerifySms(telefone, codigo) {
 // ── Endpoints de verificação de e-mail ────────────────────────────────────
 
 /**
- * Verifica se um e-mail já está cadastrado.
- * @param {string} email
- * @returns {Promise<{ existe: boolean }>}
- */
-export async function apiCheckEmail(email) {
-  return request(`/usuarios/verificar-email/${encodeURIComponent(email)}`)
-}
-
-/**
- * Reenvia o código de verificação para o e-mail de uma conta já cadastrada.
+ * Envia código de verificação para um e-mail.
  * @param {string} email
  */
 export async function apiSendEmailCode(email) {
-  return request(`/usuarios/email/reenviar/${encodeURIComponent(email)}`, {
+  return request('/usuarios/email/enviar', {
     method: 'POST',
+    body: JSON.stringify({ email }),
   })
 }
 
 /**
- * Verifica o código de e-mail e ativa a conta.
+ * Verifica o código de e-mail.
  * @param {string} email
  * @param {string} codigo - 6 dígitos
  */
 export async function apiVerifyEmailCode(email, codigo) {
-  return request(`/usuarios/email/ativar/${encodeURIComponent(email)}`, {
+  return request('/usuarios/email/verificar', {
     method: 'POST',
-    body: JSON.stringify({ codigo }),
+    body: JSON.stringify({ email, codigo }),
   })
 }

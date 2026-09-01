@@ -97,11 +97,9 @@ export async function verifySmsCode(phone, code) {
  */
 export async function registerAndSendEmailCode(data) {
   return apiRegister({
-    nome:          data.name,
-    email:         data.email,
-    senha:         data.password,
-    telefone:      data.phone,
-    provedor_auth: 'local',
+    nome:     data.name,
+    email:    data.email,
+    telefone: data.phone,
   })
 }
 

@@ -1,15 +1,15 @@
 /**
  * EmailVerifyController
  *
- * Gerencia o fluxo de verificação de e-mail em 2 passos:
+ * Fluxo:
  *  Passo 1 — Usuário informa nome, e-mail e senha
- *            → backend cria a conta E envia código de verificação para o e-mail
- *  Passo 2 — Usuário digita o código de 6 dígitos recebido no e-mail
- *            → backend ativa a conta
- *            → frontend navega para /login
+ *            → backend envia código de verificação para o e-mail
+ *  Passo 2 — Usuário digita o código de 6 dígitos
+ *            → backend verifica o código
+ *            → frontend cria a conta com POST /usuarios/
+ *            → navega para /login
  *
- * Pré-requisito: sessionStorage.ifood_verified_phone deve estar preenchido
- * (definido pelo PhoneVerifyController após validar o celular).
+ * Pré-requisito: sessionStorage.ifood_verified_phone deve estar preenchido.
  */
 
 import {
@@ -17,24 +17,22 @@ import {
   validateEmail,
   validatePassword,
   validateCode,
-  registerAndSendEmailCode,
   resendEmailCode,
   verifyEmailCode,
 } from '../models/AuthModel.js'
 
+import { apiSendEmailCode, apiRegister } from '../services/api.js'
+
 export class EmailVerifyController {
-  /**
-   * @param {import('../views/EmailVerifyView.js').EmailVerifyView} view
-   * @param {import('../router/Router.js').Router} router
-   */
   constructor(view, router) {
-    this._view  = view
+    this._view   = view
     this._router = router
     this._email  = ''
+    this._name   = ''
+    this._phone  = ''
   }
 
   init() {
-    // Garante que o celular foi verificado antes de entrar aqui
     const phone = sessionStorage.getItem('ifood_verified_phone')
     if (!phone) {
       this._router.navigate('/verify-phone')
@@ -49,21 +47,16 @@ export class EmailVerifyController {
 
   destroy() {}
 
-  // ── Binding ────────────────────────────────────────────────────────────
-
   _bindEvents() {
     const v = this._view
 
-    // Passo 1
     v.onSendEmailCode(()  => this._handleSendEmailCode())
     v.onBackToForm(()     => this._router.navigate('/verify-phone'))
 
-    // Passo 2
     v.onVerifyEmailCode(() => this._handleVerifyEmailCode())
     v.onResendEmail(()    => this._handleResendEmail())
     v.onBackToEmailCode(() => { v.showStep(1); v.clearEmailCodeError() })
 
-    // Validação inline nos campos do formulário
     document.getElementById('email-address')?.addEventListener('blur', () => {
       const val = document.getElementById('email-address')?.value ?? ''
       const err = validateEmail(val)
@@ -77,13 +70,12 @@ export class EmailVerifyController {
     })
   }
 
-  // ── Passo 1: Cadastrar e enviar código no e-mail ──────────────────────
+  // ── Passo 1: validar campos e enviar código no e-mail ─────────────────
 
   async _handleSendEmailCode() {
     const { name, email, password } = this._view.getFormData()
     const v = this._view
 
-    // Limpa erros anteriores
     v.clearFieldError('email-name')
     v.clearFieldError('email-address')
     v.clearFieldError('email-password')
@@ -95,37 +87,34 @@ export class EmailVerifyController {
     if (nameErr)  v.showFieldError('email-name',     nameErr)
     if (emailErr) v.showFieldError('email-address',  emailErr)
     if (passErr)  v.showFieldError('email-password', passErr)
-
     if (nameErr || emailErr || passErr) return
 
-    this._email = email
+    // Salva localmente para usar no passo 2
+    this._email    = email
+    this._name     = name
+    this._password = password
 
     v.setSendLoading(true)
     try {
-      await registerAndSendEmailCode({
-        name,
-        email,
-        password,
-        phone: this._phone,
-      })
-
+      // Só envia o código — ainda não cria o usuário
+      await apiSendEmailCode(email)
       v.setEmailDisplay(email)
       v.showStep(2)
       v.clearEmailCodeInputs()
       v.focusFirstEmailCodeInput()
     } catch (err) {
       const msg = err.message ?? ''
-      if (msg.toLowerCase().includes('email') || msg.toLowerCase().includes('e-mail') || msg.toLowerCase().includes('cadastrado')) {
+      if (msg.toLowerCase().includes('cadastrado')) {
         v.showFieldError('email-address', 'Este e-mail já está cadastrado.')
       } else {
-        v.showToast(msg || 'Erro ao criar conta. Tente novamente.', 'error')
+        v.showToast(msg || 'Erro ao enviar o código. Tente novamente.', 'error')
       }
     } finally {
       v.setSendLoading(false)
     }
   }
 
-  // ── Passo 2: Verificar código do e-mail ───────────────────────────────
+  // ── Passo 2: verificar código e criar a conta ─────────────────────────
 
   async _handleVerifyEmailCode() {
     const code = this._view.getEmailCode()
@@ -139,13 +128,20 @@ export class EmailVerifyController {
 
     this._view.setVerifyLoading(true)
     try {
+      // 1. Verifica o código no backend
       await verifyEmailCode(this._email, code)
 
-      // Limpa o telefone verificado do sessionStorage — fluxo concluído
+      // 2. Cria o usuário (celular e e-mail já verificados)
+      await apiRegister({
+        nome:     this._name,
+        email:    this._email,
+        telefone: this._phone,
+      })
+
       sessionStorage.removeItem('ifood_verified_phone')
 
-      this._view.showToast('Conta criada com sucesso! Faça login para continuar.', 'success')
-      setTimeout(() => this._router.navigate('/login'), 1200)
+      this._view.showToast('Conta criada com sucesso! Entre com seu celular para continuar.', 'success')
+      setTimeout(() => this._router.navigate('/auth'), 1200)
     } catch (err) {
       const msg = err.message ?? ''
       if (msg.toLowerCase().includes('expirado')) {
@@ -160,7 +156,7 @@ export class EmailVerifyController {
     }
   }
 
-  // ── Reenviar código de e-mail ─────────────────────────────────────────
+  // ── Reenviar código ───────────────────────────────────────────────────
 
   async _handleResendEmail() {
     if (!this._email) return
