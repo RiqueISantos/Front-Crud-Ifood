@@ -1,0 +1,348 @@
+/* ══════════════════════════════════════════════════════════
+   VERIFY PAGES — verificação de celular e e-mail
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Página ──────────────────────────────────────────────── */
+
+.verify-page {
+  min-height: 100vh;
+  background: #fff0f1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Logo e ajuda herdados do auth.css via classes .auth-logo / .auth-help */
+.verify-page .auth-logo {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+}
+
+.verify-page .auth-help {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 10;
+}
+
+/* ── Painel ──────────────────────────────────────────────── */
+
+.verify-panel {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 48px 40px;
+  width: 420px;
+  max-width: calc(100vw - 48px);
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Botão voltar ────────────────────────────────────────── */
+
+.verify-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 24px;
+  transition: color 0.15s;
+  font-family: inherit;
+}
+.verify-back:hover { color: var(--gray-800); }
+
+/* ── Títulos ─────────────────────────────────────────────── */
+
+.verify-panel__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.verify-panel__subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.verify-panel__subtitle strong { color: var(--gray-800); font-weight: 600; }
+
+/* ── Grupo de telefone ───────────────────────────────────── */
+
+.verify-phone-group {
+  display: flex;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.verify-phone-group:focus-within {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.1);
+}
+
+.verify-phone-ddd-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-right: 1.5px solid var(--gray-200);
+  background: var(--gray-50);
+  flex-shrink: 0;
+}
+.verify-phone-flag { font-size: 1.1rem; }
+.verify-phone-code { font-size: 0.875rem; font-weight: 600; color: var(--gray-800); }
+
+.verify-phone-input-wrap {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.verify-input {
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--gray-800);
+  background: transparent;
+  padding: 14px 10px;
+  width: 56px;
+  text-align: center;
+}
+.verify-input--number {
+  flex: 1;
+  text-align: left;
+  border-left: 1.5px solid var(--gray-200);
+  width: auto;
+  letter-spacing: 1px;
+}
+
+/* ── Campos de texto completo ────────────────────────────── */
+
+.verify-form-group  { margin-bottom: 16px; }
+
+.verify-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 6px;
+}
+
+.verify-input-full {
+  width: 100%;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--gray-800);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.verify-input-full::placeholder { color: var(--gray-400); }
+.verify-input-full:focus {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.1);
+}
+.verify-input-full.error { border-color: #e53935; }
+
+.verify-password-wrap            { position: relative; }
+.verify-password-wrap .verify-input-full { padding-right: 44px; }
+
+.verify-eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: color 0.15s;
+}
+.verify-eye-btn:hover { color: var(--gray-600); }
+
+/* ── Inputs de código (6 dígitos) ────────────────────────── */
+
+.verify-code-inputs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.verify-code-digit {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--gray-800);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  caret-color: var(--red-primary);
+  font-size: max(1.1rem, 16px);
+  padding: 0;
+}
+.verify-code-digit:focus {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.1);
+}
+.verify-code-digit.error { border-color: #e53935; }
+
+/* ── Mensagem de erro ────────────────────────────────────── */
+
+.verify-error {
+  display: block;
+  font-size: 0.78rem;
+  color: #e53935;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+
+/* ── Botão principal ─────────────────────────────────────── */
+
+.verify-btn-submit {
+  width: 100%;
+  background: var(--red-primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+.verify-btn-submit:hover    { background: var(--red-dark); }
+.verify-btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+
+/* ── Reenviar ────────────────────────────────────────────── */
+
+.verify-resend {
+  background: none;
+  border: none;
+  color: var(--red-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 0;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+.verify-resend:hover { opacity: 0.75; }
+
+/* ── Toast global ────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--gray-800);
+  color: var(--white);
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 9999;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: calc(100vw - 48px);
+  text-align: center;
+}
+.toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { background: #2e7d32; }
+.toast.error   { background: #c62828; }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVIDADE — Verify pages
+   ══════════════════════════════════════════════════════════ */
+
+/* Tablet landscape */
+@media (max-width: 900px) {
+  .verify-page .auth-illustration { display: none; }
+}
+
+/* Tablet portrait */
+@media (max-width: 767px) {
+  .verify-panel {
+    width: 100%;
+    max-width: 440px;
+    padding: 40px 28px;
+  }
+
+  .verify-panel__title { font-size: 1.5rem; }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  .verify-page {
+    align-items: flex-start;
+    justify-content: flex-start;
+    background: var(--gray-50);
+  }
+
+  .verify-panel {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 80px 20px 40px;
+  }
+
+  .verify-panel__title { font-size: 1.35rem; }
+
+  .verify-code-digit  { height: 44px; }
+  .verify-code-inputs { gap: 6px; }
+
+  .verify-input { font-size: max(1rem, 16px); padding: 12px 8px; }
+  .verify-input--number { letter-spacing: 0.5px; }
+
+  .verify-btn-submit { padding: 13px; font-size: 0.9rem; }
+
+  .toast {
+    bottom: 16px;
+    white-space: normal;
+    width: calc(100% - 32px);
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 360px) {
+  .verify-code-digit  { height: 40px; font-size: max(1rem, 16px); }
+  .verify-code-inputs { gap: 4px; }
+}

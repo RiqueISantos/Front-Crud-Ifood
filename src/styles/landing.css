@@ -1,0 +1,431 @@
+/* ══════════════════════════════════════════════════════════
+   LANDING PAGE — tela inicial estilo iFood
+   ══════════════════════════════════════════════════════════ */
+
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.landing-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-100);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.landing-header__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.landing-logo__text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--red-primary);
+  letter-spacing: -1px;
+}
+
+.landing-nav {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex: 1;
+}
+
+.landing-nav__link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-800);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.landing-nav__link:hover {
+  color: var(--red-primary);
+}
+
+.landing-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.btn-criar-conta {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--red-primary);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: opacity 0.15s;
+}
+
+.btn-criar-conta:hover { opacity: 0.75; }
+
+.btn-entrar {
+  background: var(--red-primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-entrar:hover { background: var(--red-dark); }
+
+/* ── Main ────────────────────────────────────────────────── */
+
+.landing-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  width: 100%;
+}
+
+/* ── Hero ────────────────────────────────────────────────── */
+
+.landing-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.landing-hero__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.landing-hero__subtitle {
+  font-size: 1rem;
+  color: var(--gray-600);
+  margin-bottom: 28px;
+}
+
+/* ── Busca ───────────────────────────────────────────────── */
+
+.landing-search {
+  display: flex;
+  max-width: 660px;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--gray-200);
+  background: var(--white);
+}
+
+.landing-search__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  padding: 0 16px;
+}
+
+.landing-search__pin {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.landing-search__input {
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--gray-800);
+  background: transparent;
+  width: 100%;
+  padding: 14px 0;
+  font-family: inherit;
+}
+
+.landing-search__input::placeholder { color: var(--gray-400); }
+
+.landing-search__btn {
+  background: var(--red-primary);
+  color: var(--white);
+  border: none;
+  padding: 0 32px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  height: 52px;
+}
+
+.landing-search__btn:hover { background: var(--red-dark); }
+
+/* ── Cards principais ────────────────────────────────────── */
+
+.landing-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.landing-card {
+  border-radius: 16px;
+  padding: 28px 28px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.landing-card--red   { background: var(--red-primary); }
+.landing-card--green { background: #5DAD45; }
+
+.landing-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 1;
+}
+
+.landing-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.landing-card__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  width: fit-content;
+}
+
+.landing-card__btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.landing-card__btn:hover { background: rgba(0, 0, 0, 0.4); }
+
+.landing-card__img {
+  position: absolute;
+  right: 16px;
+  bottom: 0;
+  font-size: 5rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.landing-card__emoji {
+  font-size: 5rem;
+}
+
+/* ── Categorias ──────────────────────────────────────────── */
+
+.landing-categories {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+}
+
+.landing-category {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.landing-category__img {
+  width: 80px;
+  height: 64px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.landing-category__img--yellow { background: #F5C842; }
+.landing-category__img--pink   { background: #F48FB1; }
+.landing-category__img--purple { background: #CE93D8; }
+
+.landing-category__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.landing-category__arrow {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Popup cupom ─────────────────────────────────────────── */
+
+.landing-coupon {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 16px;
+  width: 240px;
+  z-index: 200;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.landing-coupon__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.landing-coupon__close:hover { color: var(--gray-800); }
+
+.landing-coupon__close svg { width: 14px; height: 14px; }
+
+.landing-coupon__body {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.landing-coupon__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.landing-coupon__text strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.landing-coupon__text p {
+  font-size: 0.78rem;
+  color: var(--gray-600);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.landing-coupon__link {
+  background: none;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--red-primary);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.landing-coupon__link:hover { opacity: 0.75; }
+
+/* ── Responsividade ──────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .landing-nav { display: none; }
+}
+
+@media (max-width: 767px) {
+  .landing-main { padding: 32px 16px 48px; }
+
+  .landing-hero__title    { font-size: 1.5rem; }
+  .landing-hero__subtitle { font-size: 0.9rem; }
+
+  .landing-cards { gap: 12px; }
+
+  .landing-card {
+    min-height: 140px;
+    padding: 20px 20px 16px;
+  }
+
+  .landing-card__title  { font-size: 1.2rem; }
+  .landing-card__emoji  { font-size: 3.5rem; }
+
+  .landing-categories { gap: 20px; }
+
+  .landing-coupon { display: none; }
+}
+
+@media (max-width: 479px) {
+  .landing-header__inner { padding: 0 16px; gap: 16px; }
+  .landing-nav           { display: none; }
+
+  .landing-cards { grid-template-columns: 1fr; }
+
+  .landing-card {
+    min-height: 120px;
+    padding: 18px 18px 14px;
+  }
+
+  .landing-card__emoji  { font-size: 3rem; }
+
+  .landing-categories {
+    justify-content: space-around;
+    gap: 8px;
+  }
+
+  .landing-search__btn { padding: 0 20px; }
+}
