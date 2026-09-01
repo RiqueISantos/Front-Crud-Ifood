@@ -25,13 +25,11 @@ export class LandingController {
   destroy() {}
 
   _bindEvents() {
-    // "Entrar" e "Criar conta" levam para a mesma tela de auth
     this._view.onEntrar(()     => this._router.navigate('/auth'))
     this._view.onCriarConta(() => this._router.navigate('/auth'))
     this._view.onCloseCoupon()
 
     this._view.onBuscar(() => {
-      // Futuramente: navegar para busca com o endereço preenchido
       this._router.navigate('/auth')
     })
   }

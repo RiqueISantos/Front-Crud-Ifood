@@ -28,10 +28,10 @@ export class AuthController {
       this._view.showToast('Login com Google será implementado em breve.', 'default')
     })
 
-    // Celular → verificação de celular
+    // Celular → fluxo unificado (login ou cadastro detectado automaticamente)
     this._view.onPhone(() => this._router.navigate('/verify-phone'))
 
-    // E-mail → tela de input de e-mail (igual iFood)
+    // E-mail → tela de input de e-mail
     this._view.onEmail(() => this._router.navigate('/email-input'))
 
     this._view.onLogoBack(() => this._router.navigate('/'))

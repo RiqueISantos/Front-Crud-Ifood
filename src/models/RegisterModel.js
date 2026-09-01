@@ -173,7 +173,7 @@ export function validateForm(data) {
 
 // ── Submissão (integração com API) ─────────────────────────────────────────
 
-import { apiRegister, apiLogin, saveToken } from '../services/api.js'
+import { apiRegister } from '../services/api.js'
 
 /**
  * Monta o payload e envia o cadastro para a API.

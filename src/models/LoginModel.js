@@ -22,7 +22,7 @@ export const loginValidators = {
   },
 }
 
-import { apiLogin, apiRegister } from '../services/api.js'
+import { apiLogin } from '../services/api.js'
 
 /**
  * Valida todos os campos de login.

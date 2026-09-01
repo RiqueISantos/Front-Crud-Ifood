@@ -18,7 +18,7 @@ import {
   maskCPF,
   maskDate,
   maskPhone,
-} from '../../../../Ifood-Frontend/src/models/RegisterModel.js'
+} from '../models/RegisterModel.js'
 
 export class RegisterController {
   /**
