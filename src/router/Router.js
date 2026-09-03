@@ -36,7 +36,10 @@ export class Router {
 
   _resolve() {
     const hash  = window.location.hash || '#/'
-    const path  = hash.replace('#', '') || '/'
+    // Remove o '#' e descarta query params do hash (ex: #/oauth-callback?token=...)
+    // para que o path seja apenas '/oauth-callback'
+    const full  = hash.replace('#', '') || '/'
+    const path  = full.split('?')[0] || '/'
     const factory = this._routes[path] ?? this._routes['/']
 
     // Destrói o controller anterior se existir
