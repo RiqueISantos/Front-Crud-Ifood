@@ -25,7 +25,7 @@ export class AuthController {
       this._view.showToast('Login com Facebook será implementado em breve.', 'default')
     })
     this._view.onGoogle(() => {
-      this._view.showToast('Login com Google será implementado em breve.', 'default')
+      window.location.href = 'http://localhost:5000/auth/google'
     })
 
     // Celular → fluxo unificado (login ou cadastro detectado automaticamente)
