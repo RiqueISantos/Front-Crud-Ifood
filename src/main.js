@@ -23,6 +23,8 @@ import { HomeView }               from './views/HomeView.js'
 import { HomeController }         from './controllers/HomeController.js'
 import { OAuthPhoneView }         from './views/OAuthPhoneView.js'
 import { OAuthPhoneController }   from './controllers/OAuthPhoneController.js'
+import { CadastroFinalView }      from './views/CadastroFinalView.js'
+import { CadastroFinalController } from './controllers/CadastroFinalController.js'
 import { getToken, saveToken }    from './services/api.js'
 
 const app = document.getElementById('app')
@@ -47,6 +49,11 @@ const router = new Router(app, {
   '/verify-email': () => {
     const view = new EmailVerifyView(app)
     return new EmailVerifyController(view, router)
+  },
+
+  '/cadastro': () => {
+    const view = new CadastroFinalView(app)
+    return new CadastroFinalController(view, router)
   },
   '/login': () => {
     const view = new LoginView(app)

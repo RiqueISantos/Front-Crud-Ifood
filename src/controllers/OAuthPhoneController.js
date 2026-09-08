@@ -136,7 +136,10 @@ export class OAuthPhoneController {
       setTimeout(() => this._router.navigate('/home'), 700)
     } catch (e) {
       const msg = e.message || ''
-      if (msg.toLowerCase().includes('expirado')) {
+      if (msg.toLowerCase().includes('já está cadastrado') || msg.toLowerCase().includes('outra conta')) {
+        this._view.showToast('Este número já tem uma conta. Faça login pelo celular.', 'error')
+        setTimeout(() => this._router.navigate('/auth'), 2500)
+      } else if (msg.toLowerCase().includes('expirado')) {
         this._view.showCodeError('Código expirado. Solicite um novo.')
       } else if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto')) {
         this._view.showCodeError('Código incorreto. Verifique e tente novamente.')

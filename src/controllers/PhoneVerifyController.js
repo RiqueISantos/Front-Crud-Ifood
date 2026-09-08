@@ -135,7 +135,7 @@ export class PhoneVerifyController {
         await verifySmsCode(this._phone, code)
         sessionStorage.setItem('ifood_verified_phone', this._phone)
         this._view.showToast('Celular verificado!', 'success')
-        setTimeout(() => this._router.navigate('/verify-email'), 600)
+        setTimeout(() => this._router.navigate('/cadastro'), 600)
       }
     } catch (err) {
       const msg = err.message ?? ''

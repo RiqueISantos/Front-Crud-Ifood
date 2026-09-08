@@ -40,8 +40,25 @@ export class EmailVerifyController {
     }
     this._phone = phone
 
+    // Se veio do fluxo de email, o email já foi verificado
+    const emailJaVerificado = sessionStorage.getItem('ifood_verified_email')
+    if (emailJaVerificado) {
+      this._email = emailJaVerificado
+    }
+
     this._view.render()
     this._bindEvents()
+
+    // Se email já verificado, preenche o campo e vai direto para o passo 1 (só nome)
+    if (emailJaVerificado) {
+      const emailField = document.getElementById('email-address')
+      if (emailField) {
+        emailField.value = emailJaVerificado
+        emailField.readOnly = true
+        emailField.style.background = 'var(--gray-50)'
+      }
+    }
+
     this._view.showStep(1)
   }
 
@@ -89,14 +106,34 @@ export class EmailVerifyController {
     if (passErr)  v.showFieldError('email-password', passErr)
     if (nameErr || emailErr || passErr) return
 
-    // Salva localmente para usar no passo 2
     this._email    = email
     this._name     = name
     this._password = password
 
+    // Se email já foi verificado antes (veio do fluxo email → celular), cria conta direto
+    const emailJaVerificado = sessionStorage.getItem('ifood_verified_email')
+    if (emailJaVerificado && emailJaVerificado === email) {
+      v.setSendLoading(true)
+      try {
+        await apiRegister({
+          nome:     this._name,
+          email:    this._email,
+          telefone: this._phone,
+        })
+        sessionStorage.removeItem('ifood_verified_phone')
+        sessionStorage.removeItem('ifood_verified_email')
+        v.showToast('Conta criada com sucesso! Entre para continuar.', 'success')
+        setTimeout(() => this._router.navigate('/auth'), 1200)
+      } catch (err) {
+        v.showToast(err.message || 'Erro ao criar conta.', 'error')
+      } finally {
+        v.setSendLoading(false)
+      }
+      return
+    }
+
     v.setSendLoading(true)
     try {
-      // Só envia o código — ainda não cria o usuário
       await apiSendEmailCode(email)
       v.setEmailDisplay(email)
       v.showStep(2)
