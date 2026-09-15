@@ -114,6 +114,13 @@ export class AuthView {
     this._el('btn-auth-facebook')?.addEventListener('click', handler)
   }
 
+  setFacebookLoading(loading) {
+    const btn = this._el('btn-auth-facebook')
+    if (!btn) return
+    btn.disabled = loading
+    const label = btn.querySelector('.auth-btn__label')
+    if (label) label.textContent = loading ? 'Entrando...' : 'Continuar com Facebook'
+  }
   onGoogle(handler) {
     this._el('btn-auth-google')?.addEventListener('click', handler)
   }

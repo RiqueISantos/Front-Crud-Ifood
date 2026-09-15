@@ -359,3 +359,20 @@ export async function apiAtualizarRestaurante(id, data) {
 export async function apiDeletarRestaurante(id) {
   return request(`/restaurantes/${id}`, { method: 'DELETE' })
 }
+
+// ── Endpoints de OAuth Facebook ────────────────────────────────────────────
+
+/**
+ * Autentica via Facebook — envia o access_token do FB SDK para o backend.
+ * @param {string} token - access_token retornado pelo Facebook JS SDK
+ */
+export async function apiFacebookLogin(token) {
+  const result = await request('/auth/facebook', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
