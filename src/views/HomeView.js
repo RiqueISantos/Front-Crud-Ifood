@@ -61,8 +61,8 @@ function buildHeader(userName) {
               </div>
               <ul class="user-dropdown__list">
                 <li role="menuitem"><a href="#">Meus pedidos</a></li>
-                <li role="menuitem"><a href="#">Favoritos</a></li>
-                <li role="menuitem"><a href="#">Endereços</a></li>
+                <li role="menuitem"><a href="#/enderecos">Endereços</a></li>
+                <li role="menuitem"><a href="#/perfil">Meu perfil</a></li>
                 <li role="menuitem"><a href="#">iFood Pay</a></li>
                 <li role="menuitem" class="user-dropdown__divider"><a href="#" id="logout-btn">Sair</a></li>
               </ul>

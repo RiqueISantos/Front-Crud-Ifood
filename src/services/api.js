@@ -193,3 +193,169 @@ export async function apiVerifyEmailCode(email, codigo) {
     body: JSON.stringify({ email, codigo }),
   })
 }
+
+// ── Endpoints de restaurante ───────────────────────────────────────────────
+
+/**
+ * Etapa 1 do cadastro de restaurante: envia código de verificação para o e-mail.
+ * @param {string} email
+ */
+export async function apiRestauranteSolicitarCadastro(email) {
+  return request('/restaurantes/cadastro/solicitar', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+/**
+ * Etapa 2 do cadastro de restaurante: confirma código e persiste os dados.
+ * @param {{ email, codigo, nome, telefone, categoria_principal, cep, numero, complemento?, taxa_entrega?, tempo_estimado? }} data
+ */
+export async function apiRestauranteConfirmarCadastro(data) {
+  const result = await request('/restaurantes/cadastro/confirmar', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
+
+/**
+ * Etapa 1 do login de restaurante: envia código de verificação para o e-mail.
+ * @param {string} email
+ */
+export async function apiRestauranteSolicitarLogin(email) {
+  return request('/restaurantes/login/solicitar', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+/**
+ * Etapa 2 do login de restaurante: confirma código e retorna o JWT.
+ * @param {string} email
+ * @param {string} codigo
+ */
+export async function apiRestauranteLogin(email, codigo) {
+  const result = await request('/restaurantes/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, codigo }),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
+
+/**
+ * Busca dados de um restaurante pelo ID.
+ * @param {number} id
+ */
+export async function apiGetRestaurante(id) {
+  return request(`/restaurantes/${id}`)
+}
+
+/**
+ * Salva token de restaurante separado do token de usuário.
+ * @param {string} token
+ */
+export function saveRestauranteToken(token) {
+  localStorage.setItem('ifood_restaurante_token', token)
+}
+
+/**
+ * Recupera o token de restaurante.
+ */
+export function getRestauranteToken() {
+  return localStorage.getItem('ifood_restaurante_token')
+}
+
+/**
+ * Remove o token de restaurante (logout).
+ */
+export function clearRestauranteToken() {
+  localStorage.removeItem('ifood_restaurante_token')
+}
+
+// ── Endpoints de endereço ──────────────────────────────────────────────────
+
+/**
+ * Lista todos os endereços de um usuário.
+ * @param {number} usuarioId
+ */
+export async function apiListarEnderecos(usuarioId) {
+  return request(`/enderecos/usuario/${usuarioId}`)
+}
+
+/**
+ * Busca um endereço pelo ID.
+ * @param {number} id
+ */
+export async function apiGetEndereco(id) {
+  return request(`/enderecos/${id}`)
+}
+
+/**
+ * Salva um novo endereço para o usuário.
+ * @param {{ usuario_id, tipo_endereco, cep, logradouro, numero, complemento?, bairro, cidade, uf }} data
+ */
+export async function apiSalvarEndereco(data) {
+  return request('/enderecos/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza um endereço existente.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarEndereco(id, data) {
+  return request(`/enderecos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta um endereço pelo ID.
+ * @param {number} id
+ */
+export async function apiDeletarEndereco(id) {
+  return request(`/enderecos/${id}`, { method: 'DELETE' })
+}
+
+/**
+ * Consulta um CEP via backend (ViaCEP proxy).
+ * @param {string} cep - apenas dígitos
+ */
+export async function apiConsultarCep(cep) {
+  return request(`/enderecos/consulta-cep/${cep}`)
+}
+
+// ── Perfil do restaurante ──────────────────────────────────────────────────
+
+/**
+ * Atualiza dados do restaurante autenticado.
+ * Requer token JWT do restaurante.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarRestaurante(id, data) {
+  return request(`/restaurantes/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta o restaurante autenticado.
+ * Requer token JWT do restaurante.
+ * @param {number} id
+ */
+export async function apiDeletarRestaurante(id) {
+  return request(`/restaurantes/${id}`, { method: 'DELETE' })
+}

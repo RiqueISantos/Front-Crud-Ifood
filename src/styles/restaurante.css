@@ -1,0 +1,788 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   RESTAURANTE — Portal de Parceiros iFood
+   Cobre todas as telas: Landing, Email/OTP, Dados, Endereço, Login
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Variáveis locais (complementam o global.css) ────────────────────────── */
+
+:root {
+  --rest-red:        #EA1D2C;
+  --rest-red-dark:   #C8111F;
+  --rest-red-light:  #fff0f1;
+  --rest-red-bg:     #fde8ea;
+  --rest-orange:     #FF6900;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LANDING PAGE DO PARCEIRO
+   Layout dois painéis: esquerda branding, direita formulário
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rest-landing-page {
+  min-height: 100vh;
+  display: flex;
+  background: var(--white);
+}
+
+/* ── Painel esquerdo ─────────────────────────────────────────────────────── */
+
+.rest-landing-left {
+  flex: 1;
+  background: var(--rest-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Círculo decorativo de fundo */
+.rest-landing-left::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  top: -150px;
+  right: -180px;
+  pointer-events: none;
+}
+
+.rest-landing-left::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  bottom: -80px;
+  left: -60px;
+  pointer-events: none;
+}
+
+.rest-landing-left__inner {
+  max-width: 480px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Logo no painel esquerdo ─────────────────────────────────────────────── */
+
+.rest-landing-logo {
+  display: inline-flex;
+  flex-direction: column;
+  text-decoration: none;
+  margin-bottom: 48px;
+}
+
+.rest-landing-logo__text {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.rest-landing-logo__for {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Logo mobile (escondido por padrão no desktop) */
+.rest-landing-logo--mobile {
+  display: none;
+}
+
+/* ── Headline ────────────────────────────────────────────────────────────── */
+
+.rest-landing-headline {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 40px;
+  letter-spacing: -0.5px;
+}
+
+/* ── Lista de benefícios ─────────────────────────────────────────────────── */
+
+.rest-landing-benefits {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rest-landing-benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.rest-landing-benefit__icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Painel direito ──────────────────────────────────────────────────────── */
+
+.rest-landing-right {
+  width: 480px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 48px;
+  background: var(--white);
+  gap: 0;
+}
+
+/* ── Painel de acesso (card) ─────────────────────────────────────────────── */
+
+.rest-landing-panel {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rest-landing-panel__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.rest-landing-panel__subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+/* ── Botões de acesso ────────────────────────────────────────────────────── */
+
+.rest-landing-btn {
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 15px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s, border-color 0.15s;
+}
+
+.rest-landing-btn--primary {
+  background: var(--rest-red);
+  color: var(--white);
+  margin-bottom: 0;
+}
+.rest-landing-btn--primary:hover { background: var(--rest-red-dark); }
+
+.rest-landing-btn--outline {
+  background: var(--white);
+  color: var(--gray-800);
+  border: 1.5px solid var(--gray-200);
+}
+.rest-landing-btn--outline:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+/* ── Divisor ─────────────────────────────────────────────────────────────── */
+
+.rest-landing-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--gray-400);
+  font-size: 0.8rem;
+}
+.rest-landing-divider::before,
+.rest-landing-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+/* ── Termos ──────────────────────────────────────────────────────────────── */
+
+.rest-landing-terms {
+  font-size: 0.72rem;
+  color: var(--gray-400);
+  line-height: 1.5;
+  margin-top: 20px;
+  text-align: center;
+}
+.rest-landing-terms a { color: var(--gray-600); text-decoration: underline; }
+.rest-landing-terms a:hover { color: var(--gray-800); }
+
+/* ── Link "Voltar para o iFood" ──────────────────────────────────────────── */
+
+.rest-landing-back-home {
+  margin-top: 32px;
+  font-size: 0.82rem;
+  color: var(--gray-400);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.rest-landing-back-home:hover { color: var(--rest-red); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PÁGINAS INTERNAS — Email, Dados, Endereço, Login
+   Fundo rosa claro, ilustração esquerda, painel direito
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rest-page {
+  min-height: 100vh;
+  background: var(--rest-red-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Versão wide: painel mais largo para formulários com mais campos */
+.rest-page--wide {
+  align-items: flex-start;
+  padding: 80px 24px 40px;
+}
+
+/* ── Logo ────────────────────────────────────────────────────────────────── */
+
+.rest-logo {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  text-decoration: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.rest-logo__text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--rest-red);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.rest-logo__for {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  letter-spacing: 0.3px;
+}
+
+/* ── Ilustração decorativa ───────────────────────────────────────────────── */
+
+.rest-illustration {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rest-illustration__circle {
+  width: 460px;
+  height: 460px;
+  background: var(--rest-red-bg);
+  border-radius: 50%;
+  position: absolute;
+  left: -90px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rest-illustration__icon {
+  position: relative;
+  font-size: 5rem;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(234, 29, 44, 0.15));
+}
+
+/* ── Painel base ─────────────────────────────────────────────────────────── */
+
+.rest-panel {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 44px 40px;
+  width: 440px;
+  max-width: calc(100vw - 48px);
+  position: relative;
+  z-index: 5;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rest-panel--wide {
+  width: 520px;
+  margin: 0 auto;
+}
+
+/* ── Títulos ─────────────────────────────────────────────────────────────── */
+
+.rest-panel__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  line-height: 1.25;
+  margin-bottom: 0;
+}
+
+.rest-panel__subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.55;
+  margin-top: -6px;
+  margin-bottom: 4px;
+}
+.rest-panel__subtitle strong { color: var(--gray-800); }
+
+/* ── Indicador de progresso ──────────────────────────────────────────────── */
+
+.rest-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 4px;
+}
+
+.rest-progress__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rest-progress__num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-400);
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.rest-progress__label {
+  font-size: 0.7rem;
+  color: var(--gray-400);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.rest-progress__step--active .rest-progress__num {
+  border-color: var(--rest-red);
+  background: var(--rest-red);
+  color: var(--white);
+}
+.rest-progress__step--active .rest-progress__label { color: var(--rest-red); font-weight: 700; }
+
+.rest-progress__step--done .rest-progress__num {
+  border-color: var(--rest-red);
+  background: var(--rest-red);
+  color: var(--white);
+  font-size: 0.9rem;
+}
+.rest-progress__step--done .rest-progress__label { color: var(--rest-red); }
+
+.rest-progress__line {
+  flex: 1;
+  height: 2px;
+  background: var(--gray-200);
+  margin: 0 8px;
+  margin-bottom: 20px; /* alinha com os círculos */
+  transition: background 0.2s;
+}
+.rest-progress__line--done { background: var(--rest-red); }
+
+/* ── E-mail readonly ─────────────────────────────────────────────────────── */
+
+.rest-email-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-100);
+}
+
+.rest-email-readonly__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rest-email-readonly__value {
+  font-size: 0.9rem;
+  color: var(--gray-800);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* ── Campos de formulário ────────────────────────────────────────────────── */
+
+.rest-field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.rest-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.rest-required {
+  color: var(--rest-red);
+}
+
+.rest-input {
+  width: 100%;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--gray-800);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.rest-input::placeholder { color: var(--gray-400); }
+.rest-input:focus {
+  border-color: var(--rest-red);
+  box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.1);
+}
+.rest-input.error {
+  border-color: #e53935;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.08);
+}
+
+.rest-input--readonly {
+  background: var(--gray-50);
+  color: var(--gray-600);
+  cursor: default;
+}
+.rest-input--readonly:focus {
+  border-color: var(--gray-200);
+  box-shadow: none;
+}
+
+/* ── Select ──────────────────────────────────────────────────────────────── */
+
+.rest-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.rest-select {
+  cursor: pointer;
+  padding-right: 36px;
+}
+
+.rest-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+/* ── Campo com prefixo (R$) ──────────────────────────────────────────────── */
+
+.rest-input-prefix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rest-input-prefix {
+  position: absolute;
+  left: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.rest-input--prefixed {
+  padding-left: 34px;
+}
+
+/* ── Linha de dois campos ────────────────────────────────────────────────── */
+
+.rest-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+/* ── Dica abaixo do campo ────────────────────────────────────────────────── */
+
+.rest-hint {
+  font-size: 0.72rem;
+  color: var(--gray-400);
+  margin-top: -2px;
+}
+
+/* ── Mensagem de erro ────────────────────────────────────────────────────── */
+
+.rest-error {
+  display: block;
+  font-size: 0.78rem;
+  color: #e53935;
+  min-height: 16px;
+  margin-top: -2px;
+}
+
+/* ── Botão principal ─────────────────────────────────────────────────────── */
+
+.rest-btn-primary {
+  width: 100%;
+  background: var(--rest-red);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+.rest-btn-primary:hover    { background: var(--rest-red-dark); }
+.rest-btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TELA DE CEP — componentes específicos
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rest-cep-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.rest-cep-row .rest-input {
+  flex: 1;
+}
+
+.rest-btn-cep {
+  background: var(--gray-800);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.rest-btn-cep:hover    { background: #000; }
+.rest-btn-cep:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.rest-cep-link {
+  font-size: 0.75rem;
+  color: var(--rest-red);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: -2px;
+  display: inline-block;
+}
+.rest-cep-link:hover { text-decoration: underline; }
+
+/* ── Loading spinner do CEP ──────────────────────────────────────────────── */
+
+.rest-cep-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  padding: 6px 0;
+}
+
+.rest-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid var(--gray-200);
+  border-top-color: var(--rest-red);
+  border-radius: 50%;
+  animation: rest-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes rest-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Campos de endereço (hidden inicialmente) ────────────────────────────── */
+
+#rest-endereco-fields {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LOGIN — link "Não tem conta?"
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rest-login-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+.rest-login-cadastrar-link {
+  background: none;
+  border: none;
+  color: var(--rest-red);
+  font-weight: 700;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+.rest-login-cadastrar-link:hover { opacity: 0.8; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVIDADE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet landscape — esconde painel esquerdo da landing */
+@media (max-width: 960px) {
+  .rest-landing-left { display: none; }
+
+  .rest-landing-right {
+    width: 100%;
+    padding: 60px 32px;
+  }
+
+  .rest-landing-logo--mobile {
+    display: flex;
+    margin-bottom: 32px;
+    align-self: flex-start;
+  }
+
+  .rest-illustration { display: none; }
+}
+
+/* Tablet portrait */
+@media (max-width: 767px) {
+  .rest-panel,
+  .rest-panel--wide {
+    width: 100%;
+    max-width: 480px;
+    padding: 36px 28px;
+  }
+
+  .rest-panel__title { font-size: 1.4rem; }
+
+  .rest-landing-headline { font-size: 2rem; }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  .rest-page {
+    align-items: flex-start;
+    background: var(--gray-50);
+  }
+
+  .rest-page--wide {
+    padding: 72px 0 0;
+  }
+
+  .rest-panel,
+  .rest-panel--wide {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 80px 20px 40px;
+    margin: 0;
+  }
+
+  .rest-panel__title  { font-size: 1.3rem; }
+
+  .rest-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rest-landing-right {
+    width: 100%;
+    padding: 48px 20px;
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: 64px;
+  }
+
+  .rest-landing-panel { max-width: 100%; }
+
+  .rest-landing-panel__title { font-size: 1.4rem; }
+
+  .rest-btn-primary { padding: 14px; font-size: 0.95rem; }
+
+  .rest-cep-row { flex-direction: column; }
+  .rest-btn-cep { width: 100%; }
+}
+
+/* Mobile pequeno */
+@media (max-width: 360px) {
+  .rest-panel,
+  .rest-panel--wide {
+    padding: 72px 16px 32px;
+  }
+}
