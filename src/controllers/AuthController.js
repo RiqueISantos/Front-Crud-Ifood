@@ -38,7 +38,6 @@ export class AuthController {
   // ── Facebook Login ─────────────────────────────────────────────────────
 
   async _handleFacebook() {
-    // Verifica se o SDK já carregou
     if (typeof FB === 'undefined') {
       this._view.showToast('SDK do Facebook ainda carregando. Tente novamente.', 'error')
       return
@@ -46,45 +45,56 @@ export class AuthController {
 
     this._view.setFacebookLoading(true)
 
-    try {
-      // Abre o popup de login do Facebook
-      const authResponse = await new Promise((resolve, reject) => {
-        FB.login(
-          (response) => {
-            if (response.authResponse) {
-              resolve(response.authResponse)
-            } else {
-              reject(new Error(response.status === 'not_authorized'
-                ? 'Permissão negada pelo usuário.'
-                : 'Login cancelado.'))
-            }
-          },
-          { scope: 'public_profile,email' }
-        )
-      })
+    // Verifica se já tem sessão ativa do Facebook
+    FB.getLoginStatus(async (statusResponse) => {
+      try {
+        let accessToken = null
 
-      const { accessToken } = authResponse
+        if (statusResponse.status === 'connected') {
+          // Já autenticado — usa o token existente direto
+          accessToken = statusResponse.authResponse.accessToken
+        } else {
+          // Abre popup de login
+          accessToken = await new Promise((resolve, reject) => {
+            FB.login(
+              (response) => {
+                if (response.authResponse?.accessToken) {
+                  resolve(response.authResponse.accessToken)
+                } else {
+                  // Se o popup foi bloqueado ou status inesperado
+                  reject(new Error(
+                    response.status === 'not_authorized'
+                      ? 'Permissão negada.'
+                      : 'cancelled'
+                  ))
+                }
+              },
+              { scope: 'public_profile,email', return_scopes: true }
+            )
+          })
+        }
 
-      // Envia o token para o backend
-      const result = await apiFacebookLogin(accessToken)
+        // Envia token para o backend
+        const result = await apiFacebookLogin(accessToken)
 
-      if (result.access_token) saveToken(result.access_token)
-      if (result.usuario) {
-        localStorage.setItem('ifood_user', JSON.stringify(result.usuario))
+        if (result.access_token) saveToken(result.access_token)
+        if (result.usuario) {
+          localStorage.setItem('ifood_user', JSON.stringify(result.usuario))
+        }
+
+        this._view.showToast('Login com Facebook realizado!', 'success')
+        setTimeout(() => this._router.navigate('/home'), 600)
+
+      } catch (err) {
+        const msg = err.message || ''
+        if (msg === 'cancelled' || msg === 'Permissão negada.') {
+          // Usuário fechou — silencioso
+        } else {
+          this._view.showToast(msg || 'Erro ao entrar com Facebook.', 'error')
+        }
+      } finally {
+        this._view.setFacebookLoading(false)
       }
-
-      this._view.showToast('Login com Facebook realizado!', 'success')
-      setTimeout(() => this._router.navigate('/home'), 600)
-
-    } catch (err) {
-      const msg = err.message || ''
-      if (msg === 'Login cancelado.' || msg === 'Permissão negada pelo usuário.') {
-        // Usuário fechou o popup — não exibe erro
-      } else {
-        this._view.showToast(msg || 'Erro ao entrar com Facebook.', 'error')
-      }
-    } finally {
-      this._view.setFacebookLoading(false)
-    }
+    })
   }
 }
