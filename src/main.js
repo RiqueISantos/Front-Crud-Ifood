@@ -5,6 +5,11 @@ import './styles/verify.css'
 import './styles/register.css'
 import './styles/login.css'
 import './styles/home.css'
+import './styles/restaurante.css'
+import './styles/restaurante-dashboard.css'
+import './styles/restaurante-cliente.css'
+import './styles/cardapio.css'
+import './styles/perfil.css'
 
 import { Router }                 from './router/Router.js'
 import { LandingView }            from './views/LandingView.js'
@@ -23,9 +28,47 @@ import { HomeView }               from './views/HomeView.js'
 import { HomeController }         from './controllers/HomeController.js'
 import { OAuthPhoneView }         from './views/OAuthPhoneView.js'
 import { OAuthPhoneController }   from './controllers/OAuthPhoneController.js'
-import { getToken, saveToken }    from './services/api.js'
+import { CadastroFinalView }      from './views/CadastroFinalView.js'
+import { CadastroFinalController } from './controllers/CadastroFinalController.js'
+import { getToken, saveToken, getRestauranteToken } from './services/api.js'
+
+// ── Restaurante (portal de parceiros) ────────────────────────────────────
+import { RestauranteLandingView }       from './views/RestauranteLandingView.js'
+import { RestauranteLandingController } from './controllers/RestauranteLandingController.js'
+import { RestauranteEmailView }         from './views/RestauranteEmailView.js'
+import { RestauranteEmailController }   from './controllers/RestauranteEmailController.js'
+import { RestauranteDadosView }         from './views/RestauranteDadosView.js'
+import { RestauranteDadosController }   from './controllers/RestauranteDadosController.js'
+import { RestauranteEnderecoView }      from './views/RestauranteEnderecoView.js'
+import { RestauranteEnderecoController } from './controllers/RestauranteEnderecoController.js'
+import { RestauranteLoginView }         from './views/RestauranteLoginView.js'
+import { RestauranteLoginController }   from './controllers/RestauranteLoginController.js'
+import { RestauranteDashboardView }     from './views/RestauranteDashboardView.js'
+import { RestauranteDashboardController } from './controllers/RestauranteDashboardController.js'
+
+// ── Perfil / Endereços ────────────────────────────────────────────────────
+import { UsuarioPerfilView }            from './views/UsuarioPerfilView.js'
+import { UsuarioPerfilController }      from './controllers/UsuarioPerfilController.js'
+import { EnderecosView }                from './views/EnderecosView.js'
+import { EnderecosController }          from './controllers/EnderecosController.js'
+import { RestaurantePerfilView }        from './views/RestaurantePerfilView.js'
+import { RestaurantePerfilController }  from './controllers/RestaurantePerfilController.js'
+
+// ── Produtos / Cardápio / Sacola ──────────────────────────────────────────
+import { RestauranteClienteView }       from './views/RestauranteClienteView.js'
+import { RestauranteClienteController } from './controllers/RestauranteClienteController.js'
+import { CardapioView }                 from './views/CardapioView.js'
+import { CardapioController }           from './controllers/CardapioController.js'
+import { SacolaView }                   from './views/SacolaView.js'
+import { SacolaController }             from './controllers/SacolaController.js'
 
 const app = document.getElementById('app')
+
+// ── Sacola singleton — montado uma vez, persiste entre rotas ─────────────
+const sacolaView = new SacolaView()
+const sacolaController = new SacolaController(sacolaView)
+sacolaController.init()
+window._sacola = sacolaController
 
 const router = new Router(app, {
   '/': () => {
@@ -47,6 +90,11 @@ const router = new Router(app, {
   '/verify-email': () => {
     const view = new EmailVerifyView(app)
     return new EmailVerifyController(view, router)
+  },
+
+  '/cadastro': () => {
+    const view = new CadastroFinalView(app)
+    return new CadastroFinalController(view, router)
   },
   '/login': () => {
     const view = new LoginView(app)
@@ -99,6 +147,99 @@ const router = new Router(app, {
     }
     const view = new HomeView(app)
     return new HomeController(view, router)
+  },
+
+  // ── Portal de parceiros (restaurante) ──────────────────────────────────
+
+  '/restaurante': () => {
+    const view = new RestauranteLandingView(app)
+    return new RestauranteLandingController(view, router)
+  },
+
+  '/restaurante/email': () => {
+    const view = new RestauranteEmailView(app)
+    return new RestauranteEmailController(view, router)
+  },
+
+  '/restaurante/dados': () => {
+    const view = new RestauranteDadosView(app)
+    return new RestauranteDadosController(view, router)
+  },
+
+  '/restaurante/endereco': () => {
+    const view = new RestauranteEnderecoView(app)
+    return new RestauranteEnderecoController(view, router)
+  },
+
+  '/restaurante/login': () => {
+    const view = new RestauranteLoginView(app)
+    return new RestauranteLoginController(view, router)
+  },
+
+  '/restaurante/dashboard': () => {
+    // Guard — precisa de token de restaurante
+    if (!getRestauranteToken()) {
+      router.navigate('/restaurante/login')
+      return { init() {}, destroy() {} }
+    }
+    const view = new RestauranteDashboardView(app)
+    return new RestauranteDashboardController(view, router)
+  },
+
+  '/restaurante/perfil': () => {
+    if (!getRestauranteToken()) {
+      router.navigate('/restaurante/login')
+      return { init() {}, destroy() {} }
+    }
+    const view = new RestaurantePerfilView(app)
+    return new RestaurantePerfilController(view, router)
+  },
+
+  // ── Perfil e endereços do usuário cliente ─────────────────────────────
+
+  '/perfil': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new UsuarioPerfilView(app)
+    return new UsuarioPerfilController(view, router)
+  },
+
+  '/enderecos': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new EnderecosView(app)
+    return new EnderecosController(view, router)
+  },
+
+  // ── Tela do restaurante para o cliente ────────────────────────────────
+
+  '/loja': () => {
+    router.navigate('/home')
+    return { init() {}, destroy() {} }
+  },
+
+  '/loja/:id': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new RestauranteClienteView(app)
+    return new RestauranteClienteController(view, router)
+  },
+
+  // ── Cardápio do parceiro ──────────────────────────────────────────────
+
+  '/restaurante/cardapio': () => {
+    if (!getRestauranteToken()) {
+      router.navigate('/restaurante/login')
+      return { init() {}, destroy() {} }
+    }
+    const view = new CardapioView(app)
+    return new CardapioController(view, router)
   },
 })
 

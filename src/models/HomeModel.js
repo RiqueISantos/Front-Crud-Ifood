@@ -1,7 +1,6 @@
 /**
  * HomeModel
- * Dados estáticos da home (categorias, banners, restaurantes).
- * Quando o back-end tiver endpoints de restaurantes, substitua aqui.
+ * Categorias e banners estáticos. Restaurantes carregados do backend.
  */
 
 export const categories = [
@@ -26,52 +25,49 @@ export const banners = [
   { id: 4, bg: '#2e7d32', title: 'Saudável hoje', sub: 'saladas e bowls frescos', emoji: '🥗', badge: 'Destaque' },
 ]
 
-export const restaurants = [
-  {
-    id: 1, name: "Bob's", category: 'Lanches · Hambúrguer',
-    rating: 4.7, time: '25–35 min', fee: 'Grátis',
-    tag: 'Mais pedido', bg: '#EA1D2C', emoji: '🍔',
-  },
-  {
-    id: 2, name: 'Pizza Hut', category: 'Pizza · Italiana',
-    rating: 4.5, time: '30–45 min', fee: 'R$ 3,99',
-    tag: 'Promoção', bg: '#FF6B00', emoji: '🍕',
-  },
-  {
-    id: 3, name: 'KFC', category: 'Frango · Fast food',
-    rating: 4.6, time: '20–30 min', fee: 'Grátis',
-    tag: null, bg: '#c8111f', emoji: '🍗',
-  },
-  {
-    id: 4, name: 'Outback', category: 'Americana · Grelhados',
-    rating: 4.8, time: '40–55 min', fee: 'R$ 6,99',
-    tag: 'Bem avaliado', bg: '#7B3F00', emoji: '🥩',
-  },
-  {
-    id: 5, name: 'Madero', category: 'Hambúrguer · Premium',
-    rating: 4.9, time: '35–50 min', fee: 'R$ 4,99',
-    tag: 'Novo', bg: '#212121', emoji: '🍔',
-  },
-  {
-    id: 6, name: 'Spoleto', category: 'Italiana · Massas',
-    rating: 4.4, time: '25–40 min', fee: 'Grátis',
-    tag: null, bg: '#1565C0', emoji: '🍝',
-  },
-  {
-    id: 7, name: 'Subway', category: 'Sanduíches · Saudável',
-    rating: 4.3, time: '15–25 min', fee: 'R$ 2,99',
-    tag: null, bg: '#2e7d32', emoji: '🥪',
-  },
-  {
-    id: 8, name: "McDonald's", category: 'Lanches · Fast food',
-    rating: 4.5, time: '20–30 min', fee: 'Grátis',
-    tag: 'Mais pedido', bg: '#F57F17', emoji: '🍟',
-  },
+// Emojis por categoria para os cards
+const CATEGORIA_EMOJI = {
+  'Lanches': '🍔', 'Pizza': '🍕', 'Japonesa': '🍣', 'Brasileira': '🇧🇷',
+  'Italiana': '🍝', 'Árabe': '🥙', 'Mexicana': '🌮', 'Chinesa': '🍜',
+  'Frutos do Mar': '🐟', 'Vegetariana': '🥗', 'Saudável': '🥗',
+  'Açaí': '🫐', 'Sorvetes': '🍦', 'Doces & Bolos': '🎂', 'Padaria': '🥖',
+  'Cafeteria': '☕', 'Carnes': '🥩', 'Frango': '🍗', 'Marmita': '🍱',
+  'Bebidas': '🥤', 'Outro': '🍽️',
+}
+
+const BG_COLORS = [
+  '#EA1D2C','#FF6B00','#1565C0','#2e7d32','#7B3F00',
+  '#212121','#6a1b9a','#00838f','#c62828','#4e342e',
 ]
 
 /**
- * Lê o nome do usuário salvo pelo login (retornado pela API).
- * Fallback para 'Visitante' se não existir.
+ * Converte um restaurante do backend para o formato usado na HomeView.
+ */
+export function adaptarRestaurante(r, idx = 0) {
+  const taxa = r.taxa_entrega != null
+    ? `R$ ${Number(r.taxa_entrega).toFixed(2).replace('.', ',')}`
+    : 'Grátis'
+  return {
+    id:       r.id,
+    name:     r.nome,
+    category: r.categoria_principal,
+    rating:   '—',
+    time:     r.tempo_estimado ?? '—',
+    fee:      taxa,
+    tag:      null,
+    bg:       BG_COLORS[idx % BG_COLORS.length],
+    emoji:    CATEGORIA_EMOJI[r.categoria_principal] ?? '🍽️',
+  }
+}
+
+// Fallback estático caso o backend não responda
+export const restaurantsFallback = [
+  { id: 0, name: "Bob's", category: 'Lanches', rating: 4.7, time: '25–35 min', fee: 'Grátis', tag: 'Mais pedido', bg: '#EA1D2C', emoji: '🍔' },
+  { id: 0, name: 'Pizza Hut', category: 'Pizza', rating: 4.5, time: '30–45 min', fee: 'R$ 3,99', tag: 'Promoção', bg: '#FF6B00', emoji: '🍕' },
+]
+
+/**
+ * Lê o nome do usuário salvo pelo login.
  */
 export function getUserName() {
   try {

@@ -36,12 +36,21 @@ export class OAuthPhoneController {
   destroy() {}
 
   _bindEvents() {
-    this._view.onSend(()        => this._handleSend())
-    this._view.onNotMyNumber(() => this._handleNotMyNumber())
-    this._view.onVerify(()      => this._handleVerify())
-    this._view.onResend(()      => this._handleResend())
-    this._view.onBackPhone(()   => this._router.navigate('/auth'))
-    this._view.onBackCode(()    => { this._view.showStep(1); this._view.clearCodeError() })
+    // Remove listeners antigos clonando os botões para evitar duplicação
+    const replaceBtn = id => {
+      const el = document.getElementById(id)
+      if (!el) return null
+      const clone = el.cloneNode(true)
+      el.parentNode.replaceChild(clone, el)
+      return clone
+    }
+
+    replaceBtn('btn-send-whatsapp')?.addEventListener('click', () => this._handleSend())
+    replaceBtn('btn-not-my-number')?.addEventListener('click', () => this._handleNotMyNumber())
+    replaceBtn('btn-verify-code')?.addEventListener('click',   () => this._handleVerify())
+    replaceBtn('btn-resend-code')?.addEventListener('click',   () => this._handleResend())
+    replaceBtn('btn-back-phone')?.addEventListener('click',    () => this._router.navigate('/auth'))
+    replaceBtn('btn-back-code')?.addEventListener('click',     () => { this._view.showStep(1); this._view.clearCodeError() })
 
     // Máscara no input de número (apenas quando não tem telefone)
     if (!this._temTelefone) {
@@ -85,6 +94,7 @@ export class OAuthPhoneController {
       this._view.setPhoneSentDisplay(display)
       this._view.showStep(2)
       this._view.clearCodeInputs()
+      this._view.fillCodeRandom()
       this._view.focusFirstCode()
     } catch (e) {
       this._view.showToast(e.message || 'Erro ao enviar código.', 'error')
@@ -114,7 +124,12 @@ export class OAuthPhoneController {
 
     this._view.setVerifyLoading(true)
     try {
-      const res = await fetch(`${BASE_URL}/auth/google/confirmar`, {
+      // Em dev, usa a rota de bypass para não depender do SMS
+      const endpoint = import.meta.env.DEV
+        ? `${BASE_URL}/auth/google/dev-bypass`
+        : `${BASE_URL}/auth/google/confirmar`
+
+      const res = await fetch(endpoint, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
@@ -133,10 +148,13 @@ export class OAuthPhoneController {
       }
 
       this._view.showToast('Celular confirmado! Bem-vindo ao iFood 🎉', 'success')
-      setTimeout(() => this._router.navigate('/home'), 700)
+      setTimeout(() => { window.location.hash = '#/home' }, 700)
     } catch (e) {
       const msg = e.message || ''
-      if (msg.toLowerCase().includes('expirado')) {
+      if (msg.toLowerCase().includes('já está cadastrado') || msg.toLowerCase().includes('outra conta')) {
+        this._view.showToast('Este número já tem uma conta. Faça login pelo celular.', 'error')
+        setTimeout(() => this._router.navigate('/auth'), 2500)
+      } else if (msg.toLowerCase().includes('expirado')) {
         this._view.showCodeError('Código expirado. Solicite um novo.')
       } else if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto')) {
         this._view.showCodeError('Código incorreto. Verifique e tente novamente.')

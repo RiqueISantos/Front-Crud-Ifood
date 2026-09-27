@@ -1,0 +1,575 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   RESTAURANTE CLIENTE — Tela do restaurante (cardápio) + Sacola (drawer)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Página ──────────────────────────────────────────────────────────────── */
+
+.rc-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar ──────────────────────────────────────────────────────────────── */
+
+.rc-topbar {
+  background: #fff;
+  border-bottom: 1px solid #ebebeb;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.rc-topbar__back {
+  background: none;
+  border: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #616161;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.rc-topbar__back:hover { background: #f5f5f5; color: #EA1D2C; }
+
+.rc-topbar__logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #EA1D2C;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.rc-topbar__sacola-btn {
+  margin-left: auto;
+  position: relative;
+  background: #EA1D2C;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 18px 8px 14px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s;
+}
+.rc-topbar__sacola-btn:hover { background: #c8111f; }
+
+.rc-topbar__sacola-count {
+  background: #fff;
+  color: #EA1D2C;
+  font-size: 0.72rem;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Hero do restaurante ─────────────────────────────────────────────────── */
+
+.rc-hero {
+  background: linear-gradient(135deg, #EA1D2C 0%, #c8111f 100%);
+  padding: 28px 24px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.rc-hero__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.rc-hero__info { flex: 1; min-width: 0; }
+
+.rc-hero__nome {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-hero__cat {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 10px;
+}
+
+.rc-hero__meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rc-hero__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+}
+
+/* ── Conteúdo principal ──────────────────────────────────────────────────── */
+
+.rc-content {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 24px 24px 80px;
+  flex: 1;
+}
+
+/* ── Seção do cardápio ───────────────────────────────────────────────────── */
+
+.rc-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.rc-produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+/* ── Card de produto ─────────────────────────────────────────────────────── */
+
+.rc-produto-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  transition: box-shadow 0.2s, transform 0.15s;
+  cursor: default;
+}
+
+.rc-produto-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+.rc-produto-card__emoji {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.rc-produto-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rc-produto-card__nome {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-produto-card__desc {
+  font-size: 0.75rem;
+  color: #9e9e9e;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.rc-produto-card__preco {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #212121;
+}
+
+.rc-produto-card__add {
+  background: #EA1D2C;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+  line-height: 1;
+}
+.rc-produto-card__add:hover    { background: #c8111f; transform: scale(1.1); }
+.rc-produto-card__add:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── Empty / Loading ─────────────────────────────────────────────────────── */
+
+.rc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 14px;
+  background: #f5f5f5;
+}
+
+.rc-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #EA1D2C;
+  border-radius: 50%;
+  animation: rc-spin 0.7s linear infinite;
+}
+@keyframes rc-spin { to { transform: rotate(360deg); } }
+
+.rc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 20px;
+  text-align: center;
+  color: #9e9e9e;
+  font-size: 0.88rem;
+}
+.rc-empty__icon { font-size: 2.5rem; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SACOLA — DRAWER LATERAL
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.sacola-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.sacola-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.sacola-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  max-width: 100vw;
+  background: #fff;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.15);
+}
+.sacola-drawer.open { transform: translateX(0); }
+
+/* Header da sacola */
+.sacola-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.sacola-header__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #212121;
+}
+
+.sacola-header__close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #9e9e9e;
+  padding: 4px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+.sacola-header__close:hover { color: #212121; background: #f5f5f5; }
+
+/* Restaurante info na sacola */
+.sacola-rest-info {
+  padding: 12px 20px;
+  background: #fff8f8;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.8rem;
+  color: #616161;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.sacola-rest-info strong { color: #212121; }
+
+/* Lista de itens */
+.sacola-itens {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.sacola-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #fafafa;
+}
+
+.sacola-item__emoji {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+.sacola-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sacola-item__nome {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #212121;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sacola-item__obs {
+  font-size: 0.72rem;
+  color: #9e9e9e;
+  margin-top: 1px;
+}
+
+.sacola-item__preco {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #212121;
+  white-space: nowrap;
+}
+
+/* Controle de quantidade */
+.sacola-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sacola-qty__btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1;
+  color: #212121;
+}
+.sacola-qty__btn:hover  { border-color: #EA1D2C; background: #fff0f1; color: #EA1D2C; }
+
+.sacola-qty__num {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #212121;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Empty sacola */
+.sacola-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  padding: 40px 20px;
+  text-align: center;
+}
+.sacola-empty__icon { font-size: 3rem; }
+.sacola-empty__text { font-size: 0.88rem; color: #9e9e9e; line-height: 1.5; }
+
+/* Footer da sacola */
+.sacola-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.sacola-totais {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.sacola-totais__linha {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #616161;
+}
+.sacola-totais__linha--total {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #212121;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+}
+
+.sacola-btn-finalizar {
+  width: 100%;
+  background: #EA1D2C;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sacola-btn-finalizar:hover    { background: #c8111f; }
+.sacola-btn-finalizar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.sacola-btn-limpar {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #9e9e9e;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 8px;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+.sacola-btn-limpar:hover { color: #EA1D2C; }
+
+/* Modal de conflito de restaurante */
+.sacola-conflito-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.sacola-conflito-modal[hidden] { display: none !important; }
+
+.sacola-conflito-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  max-width: 380px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sacola-conflito-box__title { font-size: 1.1rem; font-weight: 700; color: #212121; }
+.sacola-conflito-box__text  { font-size: 0.88rem; color: #616161; line-height: 1.55; }
+.sacola-conflito-box__btns  { display: flex; gap: 10px; margin-top: 8px; }
+
+/* ── Responsividade ──────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .rc-content  { padding: 16px 16px 80px; }
+  .rc-hero     { padding: 20px 16px; }
+  .rc-produtos-grid { grid-template-columns: 1fr; }
+  .sacola-drawer { width: 100vw; }
+}
+
+/* ── Modal observação ─────────────────────────────────────────────────────── */
+.rc-obs-input {
+  width: 100%;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.rc-obs-input:focus { border-color: #ea1d2c; }

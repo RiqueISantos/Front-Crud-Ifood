@@ -15,5 +15,23 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+
+    <!-- Facebook SDK -->
+    <script>
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId:   '1798336045058515',
+          cookie:  true,
+          xfbml:   false,
+          version: 'v19.0',
+        })
+      };
+      (function (d, s, id) {
+        if (d.getElementById(id)) return
+        var js = d.createElement(s); js.id = id; js.async = true
+        js.src = 'https://connect.facebook.net/pt_BR/sdk.js'
+        d.getElementsByTagName('head')[0].appendChild(js)
+      }(document, 'script', 'facebook-jssdk'))
+    </script>
   </body>
 </html>

@@ -110,6 +110,7 @@ export class PhoneVerifyController {
     this._view.setPhoneDisplay(displayPhone)
     this._view.showStep(2)
     this._view.clearCodeInputs()
+    this._view.fillCodeRandom()
     this._view.focusFirstCodeInput()
     this._view.setSendLoading(false)
   }
@@ -139,6 +140,23 @@ export class PhoneVerifyController {
       }
     } catch (err) {
       const msg = err.message ?? ''
+
+      // Dev bypass: aceita qualquer código em modo de desenvolvimento
+      if (import.meta.env.DEV && (
+        msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto') ||
+        msg.toLowerCase().includes('expirado')
+      )) {
+        if (this._mode === 'login') {
+          this._view.showToast('Login realizado com sucesso!', 'success')
+          setTimeout(() => this._router.navigate('/home'), 600)
+        } else {
+          sessionStorage.setItem('ifood_verified_phone', this._phone)
+          this._view.showToast('Celular verificado!', 'success')
+          setTimeout(() => this._router.navigate('/verify-email'), 600)
+        }
+        return
+      }
+
       if (msg.toLowerCase().includes('expirado')) {
         this._view.showCodeError('Código expirado. Solicite um novo.')
       } else if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto')) {

@@ -174,6 +174,13 @@ export class EmailInputView {
     document.querySelectorAll('.otp-digit').forEach(i => { i.value = '' })
   }
 
+  fillOtpRandom() {
+    if (!import.meta.env.DEV) return
+    document.querySelectorAll('.otp-digit').forEach(i => {
+      i.value = String(Math.floor(Math.random() * 10))
+    })
+  }
+
   focusFirstOtp() {
     document.querySelector('.otp-digit')?.focus()
   }

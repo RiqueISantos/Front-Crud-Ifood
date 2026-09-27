@@ -209,6 +209,11 @@ export class OAuthPhoneView {
   }
 
   clearCodeInputs() { document.querySelectorAll('.verify-code-digit').forEach(i => { i.value = '' }) }
+  fillCodeRandom()  {
+    document.querySelectorAll('.verify-code-digit').forEach(i => {
+      i.value = String(Math.floor(Math.random() * 10))
+    })
+  }
   focusFirstCode()  { document.querySelector('.verify-code-digit')?.focus() }
 
   // ── Toast ─────────────────────────────────────────────────────────────────

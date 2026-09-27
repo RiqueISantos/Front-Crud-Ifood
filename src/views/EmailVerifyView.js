@@ -223,6 +223,13 @@ export class EmailVerifyView {
     document.querySelectorAll('.email-digit').forEach(i => { i.value = '' })
   }
 
+  fillEmailCodeRandom() {
+    if (!import.meta.env.DEV) return
+    document.querySelectorAll('.email-digit').forEach(i => {
+      i.value = String(Math.floor(Math.random() * 10))
+    })
+  }
+
   focusFirstEmailCodeInput() {
     document.querySelector('.email-digit')?.focus()
   }

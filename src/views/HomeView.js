@@ -3,7 +3,7 @@
  * Renderiza a tela principal do iFood após o login.
  */
 
-import { categories, banners, restaurants } from '../models/HomeModel.js'
+import { categories, banners } from '../models/HomeModel.js'
 
 // ── Builders de seções ─────────────────────────────────────────────────────
 
@@ -61,8 +61,8 @@ function buildHeader(userName) {
               </div>
               <ul class="user-dropdown__list">
                 <li role="menuitem"><a href="#">Meus pedidos</a></li>
-                <li role="menuitem"><a href="#">Favoritos</a></li>
-                <li role="menuitem"><a href="#">Endereços</a></li>
+                <li role="menuitem"><a href="#/enderecos">Endereços</a></li>
+                <li role="menuitem"><a href="#/perfil">Meu perfil</a></li>
                 <li role="menuitem"><a href="#">iFood Pay</a></li>
                 <li role="menuitem" class="user-dropdown__divider"><a href="#" id="logout-btn">Sair</a></li>
               </ul>
@@ -202,11 +202,7 @@ export class HomeView {
           <div class="home-main__inner">
             ${buildBanners()}
             ${buildCategories()}
-            ${buildRestaurants(restaurants)}
-            ${buildRestaurants(
-              restaurants.filter(r => r.fee === 'Grátis'),
-              '🛵 Com frete grátis'
-            )}
+            ${buildRestaurants([])}
           </div>
         </main>
         ${buildFooter()}
@@ -257,6 +253,48 @@ export class HomeView {
   onSearch(handler) {
     const input = document.getElementById('search-input')
     input?.addEventListener('input', () => handler(input.value))
+  }
+
+  onCartClick(handler) {
+    document.getElementById('cart-btn')?.addEventListener('click', handler)
+  }
+
+  renderSearchResults(produtos, onClickRestaurante) {
+    let panel = document.getElementById('home-search-results')
+    if (!panel) {
+      panel = document.createElement('div')
+      panel.id = 'home-search-results'
+      panel.className = 'home-search-results'
+      const inner = document.querySelector('.home-main__inner')
+      if (inner) inner.prepend(panel)
+      else document.querySelector('.home-main')?.prepend(panel)
+    }
+    panel.innerHTML = /* html */`
+      <p class="home-search-results__title">Produtos encontrados</p>
+      <div class="home-search-results__list">
+        ${produtos.map(p => /* html */`
+          <div class="home-search-result-item" data-rid="${p.restaurante_id}" role="button" tabindex="0">
+            <span class="home-search-result-item__icon">🍽️</span>
+            <div class="home-search-result-item__info">
+              <span class="home-search-result-item__nome">${p.nome}</span>
+              <span class="home-search-result-item__preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+            </div>
+            <span class="home-search-result-item__arrow">→</span>
+          </div>
+        `).join('')}
+      </div>
+    `
+    panel.querySelectorAll('.home-search-result-item').forEach(el => {
+      const handler = () => onClickRestaurante(el.dataset.rid)
+      el.addEventListener('click', handler)
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') handler() })
+    })
+    panel.style.display = 'block'
+  }
+
+  clearSearchResults() {
+    const panel = document.getElementById('home-search-results')
+    if (panel) panel.style.display = 'none'
   }
 
   // ── Banner slideshow ──────────────────────────────────────────────────────

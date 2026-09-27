@@ -35,16 +35,42 @@ async function request(path, options = {}) {
     headers,
   })
 
-  // Tenta extrair o corpo como JSON independente do status
   let body = null
   try {
     body = await response.json()
-  } catch {
-    // resposta sem corpo (ex: 204)
-  }
+  } catch {}
 
   if (!response.ok) {
-    // Usa a mensagem do backend se disponível
+    const message = body?.erro ?? body?.message ?? `Erro ${response.status}`
+    throw new Error(message)
+  }
+
+  return body
+}
+
+// Igual ao request mas usa o token do restaurante
+async function requestRest(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+
+  const token = localStorage.getItem('ifood_restaurante_token')
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers,
+  })
+
+  let body = null
+  try {
+    body = await response.json()
+  } catch {}
+
+  if (!response.ok) {
     const message = body?.erro ?? body?.message ?? `Erro ${response.status}`
     throw new Error(message)
   }
@@ -192,4 +218,293 @@ export async function apiVerifyEmailCode(email, codigo) {
     method: 'POST',
     body: JSON.stringify({ email, codigo }),
   })
+}
+
+// ── Endpoints de restaurante ───────────────────────────────────────────────
+
+/**
+ * Etapa 1 do cadastro de restaurante: envia código de verificação para o e-mail.
+ * @param {string} email
+ */
+export async function apiRestauranteSolicitarCadastro(email) {
+  return request('/restaurantes/cadastro/solicitar', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+/**
+ * Etapa 2 do cadastro de restaurante: confirma código e persiste os dados.
+ * @param {{ email, codigo, nome, telefone, categoria_principal, cep, numero, complemento?, taxa_entrega?, tempo_estimado? }} data
+ */
+export async function apiRestauranteConfirmarCadastro(data) {
+  const result = await request('/restaurantes/cadastro/confirmar', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
+
+/**
+ * Etapa 1 do login de restaurante: envia código de verificação para o e-mail.
+ * @param {string} email
+ */
+export async function apiRestauranteSolicitarLogin(email) {
+  return request('/restaurantes/login/solicitar', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
+}
+
+/**
+ * Etapa 2 do login de restaurante: confirma código e retorna o JWT.
+ * @param {string} email
+ * @param {string} codigo
+ */
+export async function apiRestauranteLogin(email, codigo) {
+  const result = await request('/restaurantes/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, codigo }),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
+
+/**
+ * Busca dados de um restaurante pelo ID.
+ * @param {number} id
+ */
+export async function apiGetRestaurante(id) {
+  return request(`/restaurantes/${id}`)
+}
+
+/**
+ * Salva token de restaurante separado do token de usuário.
+ * @param {string} token
+ */
+export function saveRestauranteToken(token) {
+  localStorage.setItem('ifood_restaurante_token', token)
+}
+
+/**
+ * Recupera o token de restaurante.
+ */
+export function getRestauranteToken() {
+  return localStorage.getItem('ifood_restaurante_token')
+}
+
+/**
+ * Remove o token de restaurante (logout).
+ */
+export function clearRestauranteToken() {
+  localStorage.removeItem('ifood_restaurante_token')
+}
+
+// ── Endpoints de endereço ──────────────────────────────────────────────────
+
+/**
+ * Lista todos os endereços de um usuário.
+ * @param {number} usuarioId
+ */
+export async function apiListarEnderecos(usuarioId) {
+  return request(`/enderecos/usuario/${usuarioId}`)
+}
+
+/**
+ * Busca um endereço pelo ID.
+ * @param {number} id
+ */
+export async function apiGetEndereco(id) {
+  return request(`/enderecos/${id}`)
+}
+
+/**
+ * Salva um novo endereço para o usuário.
+ * @param {{ usuario_id, tipo_endereco, cep, logradouro, numero, complemento?, bairro, cidade, uf }} data
+ */
+export async function apiSalvarEndereco(data) {
+  return request('/enderecos/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza um endereço existente.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarEndereco(id, data) {
+  return request(`/enderecos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta um endereço pelo ID.
+ * @param {number} id
+ */
+export async function apiDeletarEndereco(id) {
+  return request(`/enderecos/${id}`, { method: 'DELETE' })
+}
+
+/**
+ * Consulta um CEP via backend (ViaCEP proxy).
+ * @param {string} cep - apenas dígitos
+ */
+export async function apiConsultarCep(cep) {
+  return request(`/enderecos/consulta-cep/${cep}`)
+}
+
+// ── Perfil do restaurante ──────────────────────────────────────────────────
+
+/**
+ * Atualiza dados do restaurante autenticado.
+ * Requer token JWT do restaurante.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarRestaurante(id, data) {
+  return requestRest(`/restaurantes/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta o restaurante autenticado.
+ * Requer token JWT do restaurante.
+ * @param {number} id
+ */
+export async function apiDeletarRestaurante(id) {
+  return requestRest(`/restaurantes/${id}`, { method: 'DELETE' })
+}
+
+// ── Endpoints de OAuth Facebook ────────────────────────────────────────────
+
+/**
+ * Autentica via Facebook — envia o access_token do FB SDK para o backend.
+ * @param {string} token - access_token retornado pelo Facebook JS SDK
+ */
+export async function apiFacebookLogin(token) {
+  const result = await request('/auth/facebook', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+  if (result.access_token) {
+    saveToken(result.access_token)
+  }
+  return result
+}
+
+// ── Endpoints de Produtos ──────────────────────────────────────────────────
+
+/**
+ * Lista produtos de um restaurante.
+ * @param {number} restauranteId
+ */
+export async function apiListarProdutos(restauranteId) {
+  return request(`/produtos/restaurante/${restauranteId}`)
+}
+
+/**
+ * Busca produtos por nome (e opcionalmente por restaurante).
+ * @param {string} q
+ * @param {number|null} restauranteId
+ */
+export async function apiBuscarProdutos(q, restauranteId = null) {
+  const params = new URLSearchParams({ q })
+  if (restauranteId) params.append('restaurante_id', restauranteId)
+  return request(`/produtos/busca?${params}`)
+}
+
+/**
+ * Cria um novo produto no cardápio. Requer JWT do restaurante.
+ * @param {{ nome, descricao, preco, disponivel? }} data
+ */
+export async function apiCriarProduto(data) {
+  return requestRest('/produtos/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza um produto. Requer JWT do restaurante dono.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarProduto(id, data) {
+  return requestRest(`/produtos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta um produto. Requer JWT do restaurante dono.
+ * @param {number} id
+ */
+export async function apiDeletarProduto(id) {
+  return requestRest(`/produtos/${id}`, { method: 'DELETE' })
+}
+
+/**
+ * Lista todos os restaurantes cadastrados (rota pública).
+ */
+export async function apiListarRestaurantes() {
+  return request('/restaurantes/')
+}
+
+// ── Endpoints de Sacola ────────────────────────────────────────────────────
+
+/**
+ * Consulta a sacola atual do usuário autenticado.
+ */
+export async function apiVerSacola() {
+  return request('/sacola')
+}
+
+/**
+ * Adiciona um produto à sacola.
+ * @param {{ produto_id, quantidade?, observacao?, substituir_sacola? }} data
+ */
+export async function apiAdicionarItemSacola(data) {
+  return request('/sacola/itens', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza a quantidade de um item da sacola.
+ * @param {number} itemId
+ * @param {number} quantidade
+ */
+export async function apiAtualizarItemSacola(itemId, quantidade) {
+  return request(`/sacola/itens/${itemId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ quantidade }),
+  })
+}
+
+/**
+ * Remove um item da sacola.
+ * @param {number} itemId
+ */
+export async function apiRemoverItemSacola(itemId) {
+  return request(`/sacola/itens/${itemId}`, { method: 'DELETE' })
+}
+
+/**
+ * Limpa toda a sacola do usuário.
+ */
+export async function apiLimparSacola() {
+  return request('/sacola', { method: 'DELETE' })
 }

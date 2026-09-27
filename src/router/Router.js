@@ -36,15 +36,26 @@ export class Router {
 
   _resolve() {
     const hash  = window.location.hash || '#/'
-    // Remove o '#' e descarta query params do hash (ex: #/oauth-callback?token=...)
-    // para que o path seja apenas '/oauth-callback'
     const full  = hash.replace('#', '') || '/'
     const path  = full.split('?')[0] || '/'
-    const factory = this._routes[path] ?? this._routes['/']
 
-    // Destrói o controller anterior se existir
+    // Tenta match exato primeiro
+    let factory = this._routes[path]
+
+    // Se não encontrou, tenta match por prefixo para rotas dinâmicas (/loja/3)
+    if (!factory) {
+      const segments = path.split('/')
+      // tenta /loja/:id → chave /loja
+      const parentPath = '/' + segments[1]
+      // Para /loja/3 usa a factory de /loja e passa o id via hash
+      if (this._routes[parentPath] && segments.length >= 3) {
+        factory = this._routes[parentPath + '/:id'] ?? this._routes[parentPath]
+      }
+    }
+
+    factory = factory ?? this._routes['/']
+
     if (this._current?.destroy) this._current.destroy()
-
     this._current = factory()
     this._current.init()
   }
