@@ -35,16 +35,42 @@ async function request(path, options = {}) {
     headers,
   })
 
-  // Tenta extrair o corpo como JSON independente do status
   let body = null
   try {
     body = await response.json()
-  } catch {
-    // resposta sem corpo (ex: 204)
-  }
+  } catch {}
 
   if (!response.ok) {
-    // Usa a mensagem do backend se disponível
+    const message = body?.erro ?? body?.message ?? `Erro ${response.status}`
+    throw new Error(message)
+  }
+
+  return body
+}
+
+// Igual ao request mas usa o token do restaurante
+async function requestRest(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+
+  const token = localStorage.getItem('ifood_restaurante_token')
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers,
+  })
+
+  let body = null
+  try {
+    body = await response.json()
+  } catch {}
+
+  if (!response.ok) {
     const message = body?.erro ?? body?.message ?? `Erro ${response.status}`
     throw new Error(message)
   }
@@ -345,7 +371,7 @@ export async function apiConsultarCep(cep) {
  * @param {object} data
  */
 export async function apiAtualizarRestaurante(id, data) {
-  return request(`/restaurantes/${id}`, {
+  return requestRest(`/restaurantes/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
@@ -357,7 +383,7 @@ export async function apiAtualizarRestaurante(id, data) {
  * @param {number} id
  */
 export async function apiDeletarRestaurante(id) {
-  return request(`/restaurantes/${id}`, { method: 'DELETE' })
+  return requestRest(`/restaurantes/${id}`, { method: 'DELETE' })
 }
 
 // ── Endpoints de OAuth Facebook ────────────────────────────────────────────
@@ -375,4 +401,110 @@ export async function apiFacebookLogin(token) {
     saveToken(result.access_token)
   }
   return result
+}
+
+// ── Endpoints de Produtos ──────────────────────────────────────────────────
+
+/**
+ * Lista produtos de um restaurante.
+ * @param {number} restauranteId
+ */
+export async function apiListarProdutos(restauranteId) {
+  return request(`/produtos/restaurante/${restauranteId}`)
+}
+
+/**
+ * Busca produtos por nome (e opcionalmente por restaurante).
+ * @param {string} q
+ * @param {number|null} restauranteId
+ */
+export async function apiBuscarProdutos(q, restauranteId = null) {
+  const params = new URLSearchParams({ q })
+  if (restauranteId) params.append('restaurante_id', restauranteId)
+  return request(`/produtos/busca?${params}`)
+}
+
+/**
+ * Cria um novo produto no cardápio. Requer JWT do restaurante.
+ * @param {{ nome, descricao, preco, disponivel? }} data
+ */
+export async function apiCriarProduto(data) {
+  return requestRest('/produtos/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza um produto. Requer JWT do restaurante dono.
+ * @param {number} id
+ * @param {object} data
+ */
+export async function apiAtualizarProduto(id, data) {
+  return requestRest(`/produtos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Deleta um produto. Requer JWT do restaurante dono.
+ * @param {number} id
+ */
+export async function apiDeletarProduto(id) {
+  return requestRest(`/produtos/${id}`, { method: 'DELETE' })
+}
+
+/**
+ * Lista todos os restaurantes cadastrados (rota pública).
+ */
+export async function apiListarRestaurantes() {
+  return request('/restaurantes/')
+}
+
+// ── Endpoints de Sacola ────────────────────────────────────────────────────
+
+/**
+ * Consulta a sacola atual do usuário autenticado.
+ */
+export async function apiVerSacola() {
+  return request('/sacola')
+}
+
+/**
+ * Adiciona um produto à sacola.
+ * @param {{ produto_id, quantidade?, observacao?, substituir_sacola? }} data
+ */
+export async function apiAdicionarItemSacola(data) {
+  return request('/sacola/itens', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Atualiza a quantidade de um item da sacola.
+ * @param {number} itemId
+ * @param {number} quantidade
+ */
+export async function apiAtualizarItemSacola(itemId, quantidade) {
+  return request(`/sacola/itens/${itemId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ quantidade }),
+  })
+}
+
+/**
+ * Remove um item da sacola.
+ * @param {number} itemId
+ */
+export async function apiRemoverItemSacola(itemId) {
+  return request(`/sacola/itens/${itemId}`, { method: 'DELETE' })
+}
+
+/**
+ * Limpa toda a sacola do usuário.
+ */
+export async function apiLimparSacola() {
+  return request('/sacola', { method: 'DELETE' })
 }

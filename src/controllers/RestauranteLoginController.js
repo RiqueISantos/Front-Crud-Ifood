@@ -13,6 +13,8 @@ import {
   saveRestauranteToken,
 } from '../services/api.js'
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+
 function validateEmail(email) {
   if (!email) return 'O e-mail é obrigatório'
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Informe um e-mail válido'
@@ -60,6 +62,7 @@ export class RestauranteLoginController {
       this._view.setOtpEmailDisplay(email)
       this._view.showStep(2)
       this._view.clearOtpInputs()
+      this._view.fillOtpRandom()
       this._view.focusFirstOtp()
     } catch (e) {
       const msg = (e.message ?? '').toLowerCase()
@@ -87,11 +90,21 @@ export class RestauranteLoginController {
     this._view.setOtpLoading(true)
 
     try {
-      const result = await apiRestauranteLogin(this._email, code)
-
-      if (result.access_token) {
-        saveRestauranteToken(result.access_token)
+      let result
+      if (import.meta.env.DEV) {
+        const res = await fetch(`${BASE_URL}/restaurantes/login/dev-bypass`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this._email }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.erro || 'Erro ao fazer login')
+        result = data
+      } else {
+        result = await apiRestauranteLogin(this._email, code)
       }
+
+      if (result.access_token) saveRestauranteToken(result.access_token)
       if (result.restaurante) {
         localStorage.setItem('ifood_restaurante', JSON.stringify(result.restaurante))
       }

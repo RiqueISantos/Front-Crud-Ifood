@@ -17,6 +17,8 @@
 
 import { apiRestauranteConfirmarCadastro, saveRestauranteToken } from '../services/api.js'
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+
 export class RestauranteEnderecoController {
   constructor(view, router) {
     this._view   = view
@@ -130,17 +132,26 @@ export class RestauranteEnderecoController {
     this._view.setFinalizarLoading(true)
 
     try {
-      const result = await apiRestauranteConfirmarCadastro(payload)
-
-      // Salva token de restaurante separado do token de cliente
-      if (result.access_token) {
-        saveRestauranteToken(result.access_token)
+      // Em dev, usa rota que não valida o código OTP
+      let result
+      if (import.meta.env.DEV) {
+        const res = await fetch(`${BASE_URL}/restaurantes/cadastro/dev-bypass`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.erro || 'Erro ao finalizar cadastro')
+        result = data
+      } else {
+        result = await apiRestauranteConfirmarCadastro(payload)
       }
+
+      if (result.access_token) saveRestauranteToken(result.access_token)
       if (result.restaurante) {
         localStorage.setItem('ifood_restaurante', JSON.stringify(result.restaurante))
       }
 
-      // Limpa dados temporários de sessão
       sessionStorage.removeItem('rest_email_verificado')
       sessionStorage.removeItem('rest_codigo_verificacao')
       sessionStorage.removeItem('rest_dados')
@@ -149,10 +160,7 @@ export class RestauranteEnderecoController {
       setTimeout(() => this._router.navigate('/restaurante/dashboard'), 1000)
     } catch (err) {
       const msg = (err.message ?? '').toLowerCase()
-      if (msg.includes('código') || msg.includes('expirado') || msg.includes('invalido') || msg.includes('inválido')) {
-        this._view.showToast('Código expirado ou inválido. Reinicie o cadastro.', 'error')
-        setTimeout(() => this._router.navigate('/restaurante/email'), 2500)
-      } else if (msg.includes('e-mail') || msg.includes('email') || msg.includes('cadastrado')) {
+      if (msg.includes('e-mail') || msg.includes('email') || msg.includes('cadastrado')) {
         this._view.showToast('E-mail já cadastrado. Faça login.', 'error')
         setTimeout(() => this._router.navigate('/restaurante/login'), 2000)
       } else {

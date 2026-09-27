@@ -360,6 +360,14 @@ export class RestauranteDashboardView {
     document.getElementById('btn-action-perfil')?.addEventListener('click', handler)
   }
 
+  onGerenciarCardapio(handler) {
+    document.getElementById('btn-action-cardapio')?.addEventListener('click', handler)
+  }
+
+  onNavCardapio(handler) {
+    document.getElementById('nav-cardapio')?.addEventListener('click', handler)
+  }
+
   showToast(message, type = 'default') {
     let toast = document.getElementById('rdash-toast')
     if (!toast) {

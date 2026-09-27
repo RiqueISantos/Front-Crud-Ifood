@@ -197,6 +197,13 @@ export class PhoneVerifyView {
     document.querySelectorAll('.verify-code-digit').forEach(i => { i.value = '' })
   }
 
+  fillCodeRandom() {
+    if (!import.meta.env.DEV) return
+    document.querySelectorAll('.verify-code-digit').forEach(i => {
+      i.value = String(Math.floor(Math.random() * 10))
+    })
+  }
+
   focusFirstCodeInput() {
     document.querySelector('.verify-code-digit')?.focus()
   }

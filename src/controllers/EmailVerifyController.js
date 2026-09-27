@@ -138,6 +138,7 @@ export class EmailVerifyController {
       v.setEmailDisplay(email)
       v.showStep(2)
       v.clearEmailCodeInputs()
+      v.fillEmailCodeRandom()
       v.focusFirstEmailCodeInput()
     } catch (err) {
       const msg = err.message ?? ''
@@ -181,6 +182,19 @@ export class EmailVerifyController {
       setTimeout(() => this._router.navigate('/auth'), 1200)
     } catch (err) {
       const msg = err.message ?? ''
+
+      // Dev bypass: aceita qualquer código em modo de desenvolvimento
+      if (import.meta.env.DEV && (
+        msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto') ||
+        msg.toLowerCase().includes('expirado')
+      )) {
+        await apiRegister({ nome: this._name, email: this._email, telefone: this._phone })
+        sessionStorage.removeItem('ifood_verified_phone')
+        this._view.showToast('Conta criada com sucesso!', 'success')
+        setTimeout(() => this._router.navigate('/auth'), 1200)
+        return
+      }
+
       if (msg.toLowerCase().includes('expirado')) {
         this._view.showEmailCodeError('Código expirado. Solicite um novo.')
       } else if (msg.toLowerCase().includes('inválido') || msg.toLowerCase().includes('incorreto')) {

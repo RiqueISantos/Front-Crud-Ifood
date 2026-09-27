@@ -75,6 +75,7 @@ export class EmailInputController {
     this._view.setOtpEmailDisplay(email)
     this._view.showStep(2)
     this._view.clearOtpInputs()
+    this._view.fillOtpRandom()
     this._view.focusFirstOtp()
     this._view.setLoading(false)
   }
@@ -108,6 +109,22 @@ export class EmailInputController {
       }
     } catch (err) {
       const msg = (err.message ?? '').toLowerCase()
+
+      // Dev bypass
+      if (import.meta.env.DEV && (
+        msg.includes('inválido') || msg.includes('incorreto') || msg.includes('expirado')
+      )) {
+        if (this._modo === 'login') {
+          this._view.showToast('Login realizado com sucesso!', 'success')
+          setTimeout(() => this._router.navigate('/home'), 600)
+        } else {
+          sessionStorage.setItem('ifood_verified_email', this._email)
+          this._view.showToast('E-mail verificado!', 'success')
+          setTimeout(() => this._router.navigate('/verify-phone'), 600)
+        }
+        return
+      }
+
       if (msg.includes('expirado')) {
         this._view.showOtpError('Código expirado. Solicite um novo.')
       } else if (msg.includes('inválido') || msg.includes('incorreto')) {

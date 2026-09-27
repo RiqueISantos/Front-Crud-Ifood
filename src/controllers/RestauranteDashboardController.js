@@ -47,9 +47,11 @@ export class RestauranteDashboardController {
   destroy() {}
 
   _bindEvents() {
-    this._view.onLogout(       () => this._handleLogout())
-    this._view.onMinhaLoja(    () => this._router.navigate('/restaurante/perfil'))
-    this._view.onEditarPerfil( () => this._router.navigate('/restaurante/perfil'))
+    this._view.onLogout(              () => this._handleLogout())
+    this._view.onMinhaLoja(           () => this._router.navigate('/restaurante/perfil'))
+    this._view.onEditarPerfil(        () => this._router.navigate('/restaurante/perfil'))
+    this._view.onGerenciarCardapio(   () => this._router.navigate('/restaurante/cardapio'))
+    this._view.onNavCardapio(         () => this._router.navigate('/restaurante/cardapio'))
   }
 
   _handleLogout() {

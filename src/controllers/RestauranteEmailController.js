@@ -60,6 +60,7 @@ export class RestauranteEmailController {
       this._view.setOtpEmailDisplay(email)
       this._view.showStep(2)
       this._view.clearOtpInputs()
+      this._view.fillOtpRandom()
       this._view.focusFirstOtp()
     } catch (e) {
       const msg = (e.message ?? '').toLowerCase()

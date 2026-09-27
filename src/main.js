@@ -7,6 +7,8 @@ import './styles/login.css'
 import './styles/home.css'
 import './styles/restaurante.css'
 import './styles/restaurante-dashboard.css'
+import './styles/restaurante-cliente.css'
+import './styles/cardapio.css'
 import './styles/perfil.css'
 
 import { Router }                 from './router/Router.js'
@@ -52,7 +54,21 @@ import { EnderecosController }          from './controllers/EnderecosController.
 import { RestaurantePerfilView }        from './views/RestaurantePerfilView.js'
 import { RestaurantePerfilController }  from './controllers/RestaurantePerfilController.js'
 
+// ── Produtos / Cardápio / Sacola ──────────────────────────────────────────
+import { RestauranteClienteView }       from './views/RestauranteClienteView.js'
+import { RestauranteClienteController } from './controllers/RestauranteClienteController.js'
+import { CardapioView }                 from './views/CardapioView.js'
+import { CardapioController }           from './controllers/CardapioController.js'
+import { SacolaView }                   from './views/SacolaView.js'
+import { SacolaController }             from './controllers/SacolaController.js'
+
 const app = document.getElementById('app')
+
+// ── Sacola singleton — montado uma vez, persiste entre rotas ─────────────
+const sacolaView = new SacolaView()
+const sacolaController = new SacolaController(sacolaView)
+sacolaController.init()
+window._sacola = sacolaController
 
 const router = new Router(app, {
   '/': () => {
@@ -197,6 +213,33 @@ const router = new Router(app, {
     }
     const view = new EnderecosView(app)
     return new EnderecosController(view, router)
+  },
+
+  // ── Tela do restaurante para o cliente ────────────────────────────────
+
+  '/loja': () => {
+    router.navigate('/home')
+    return { init() {}, destroy() {} }
+  },
+
+  '/loja/:id': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new RestauranteClienteView(app)
+    return new RestauranteClienteController(view, router)
+  },
+
+  // ── Cardápio do parceiro ──────────────────────────────────────────────
+
+  '/restaurante/cardapio': () => {
+    if (!getRestauranteToken()) {
+      router.navigate('/restaurante/login')
+      return { init() {}, destroy() {} }
+    }
+    const view = new CardapioView(app)
+    return new CardapioController(view, router)
   },
 })
 
