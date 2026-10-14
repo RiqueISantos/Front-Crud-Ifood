@@ -569,3 +569,121 @@
 .ac-item__nome  { flex: 1; color: #212121; }
 .ac-item__preco { font-weight: 600; color: #212121; white-space: nowrap; }
 .ac-item--more  { color: #757575; font-style: italic; justify-content: center; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVIDADE — PEDIDOS (notebook 1280px+, tablet, mobile)
+   ══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  /* Confirmação de pedido — layout em duas colunas no desktop */
+  .pd-page {
+    max-width: 900px;
+    margin: 0 auto;
+    height: auto;
+    min-height: 100vh;
+    box-shadow: 0 0 40px rgba(0,0,0,.08);
+  }
+
+  .pd-scroll {
+    padding: 24px 32px;
+  }
+
+  .pd-section {
+    padding: 20px 24px;
+  }
+
+  .pd-footer {
+    padding: 20px 32px;
+  }
+
+  .pd-btn-confirmar {
+    border-radius: 14px;
+    font-size: 1.05rem;
+  }
+
+  /* Sucesso */
+  .pd-sucesso {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  /* Meus pedidos */
+  .mp-page {
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,.08);
+  }
+
+  .mp-content {
+    padding: 24px 28px;
+  }
+
+  /* Kanban restaurante */
+  .pr-page {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .pr-content {
+    padding: 24px 32px;
+  }
+
+  .pr-col {
+    flex: 0 0 300px;
+  }
+
+  /* Acompanhamento */
+  .ac-page {
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,.08);
+  }
+
+  .ac-map {
+    height: 280px;
+  }
+
+  .ac-tracker__step-label {
+    font-size: .72rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pd-page {
+    max-width: 960px;
+  }
+
+  .pd-scroll {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    grid-template-rows: auto;
+    gap: 0 24px;
+    align-items: start;
+  }
+
+  /* Restaurante e itens na coluna esquerda */
+  .pd-rest-info { grid-column: 1; }
+  .pd-section:nth-child(2) { grid-column: 1; }  /* itens */
+  .pd-section:nth-child(3) { grid-column: 1; }  /* endereço */
+  .pd-section:nth-child(4) { grid-column: 2; grid-row: 1 / 4; } /* pagamento */
+  .pd-section:nth-child(5) { grid-column: 1; } /* obs */
+  .pd-totais              { grid-column: 2; }
+
+  .pr-col {
+    flex: 0 0 280px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pd-page { height: auto; min-height: 100vh; }
+  .pr-kanban { gap: 12px; }
+  .pr-col { flex: 0 0 240px; }
+  .pr-content { padding: 12px; }
+
+  .mp-content { padding: 12px; }
+  .mp-card { padding: 12px; }
+
+  .ac-map { height: 180px; }
+  .ac-info__value { font-size: .82rem; }
+}

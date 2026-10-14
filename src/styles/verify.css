@@ -346,3 +346,21 @@
   .verify-code-digit  { height: 40px; font-size: max(1rem, 16px); }
   .verify-code-inputs { gap: 4px; }
 }
+
+/* ── RESPONSIVIDADE NOTEBOOK ─────────────────────────────── */
+@media (min-width: 900px) {
+  .verify-page {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    padding: 40px;
+  }
+  .verify-panel {
+    width: 440px;
+    max-width: 440px;
+  }
+}
+@media (min-width: 1280px) {
+  .verify-panel { width: 460px; }
+}
