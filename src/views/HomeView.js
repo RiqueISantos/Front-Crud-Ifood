@@ -60,7 +60,7 @@ function buildHeader(userName) {
                 </div>
               </div>
               <ul class="user-dropdown__list">
-                <li role="menuitem"><a href="#">Meus pedidos</a></li>
+                <li role="menuitem"><a href="#/meus-pedidos">Meus pedidos</a></li>
                 <li role="menuitem"><a href="#/enderecos">Endereços</a></li>
                 <li role="menuitem"><a href="#/perfil">Meu perfil</a></li>
                 <li role="menuitem"><a href="#">iFood Pay</a></li>

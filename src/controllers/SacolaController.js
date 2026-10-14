@@ -26,6 +26,16 @@ export class SacolaController {
     this._sacola = null
   }
 
+  /** Expõe o objeto sacola para outros controllers (ex: PedidoController) */
+  getSacola() {
+    return this._sacola
+  }
+
+  /** Recarrega sacola do backend após confirmar pedido */
+  async recarregar() {
+    await this._carregar()
+  }
+
   async init() {
     this._view.mount()
     this._bindEventos()
@@ -155,7 +165,12 @@ export class SacolaController {
     this._view.onFechar(   () => this.fechar())
     this._view.onLimpar(   () => this.limpar())
     this._view.onFinalizar(() => {
-      this._view.showToast('Funcionalidade de pedido em breve!', 'default')
+      if (!this._sacola || !this._sacola.itens?.length) {
+        this._view.showToast('Sua sacola está vazia.', 'error')
+        return
+      }
+      this.fechar()
+      window.location.hash = '#/pedido'
     })
   }
 }

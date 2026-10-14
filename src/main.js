@@ -10,6 +10,7 @@ import './styles/restaurante-dashboard.css'
 import './styles/restaurante-cliente.css'
 import './styles/cardapio.css'
 import './styles/perfil.css'
+import './styles/pedido.css'
 
 import { Router }                 from './router/Router.js'
 import { LandingView }            from './views/LandingView.js'
@@ -61,6 +62,16 @@ import { CardapioView }                 from './views/CardapioView.js'
 import { CardapioController }           from './controllers/CardapioController.js'
 import { SacolaView }                   from './views/SacolaView.js'
 import { SacolaController }             from './controllers/SacolaController.js'
+
+// ── Pedidos ───────────────────────────────────────────────────────────────
+import { PedidoView }                   from './views/PedidoView.js'
+import { PedidoController }             from './controllers/PedidoController.js'
+import { MeusPedidosView }              from './views/MeusPedidosView.js'
+import { MeusPedidosController }        from './controllers/MeusPedidosController.js'
+import { PedidosRestauranteView }       from './views/PedidosRestauranteView.js'
+import { PedidosRestauranteController } from './controllers/PedidosRestauranteController.js'
+import { AcompanhamentoView }           from './views/AcompanhamentoView.js'
+import { AcompanhamentoController }     from './controllers/AcompanhamentoController.js'
 
 const app = document.getElementById('app')
 
@@ -240,6 +251,57 @@ const router = new Router(app, {
     }
     const view = new CardapioView(app)
     return new CardapioController(view, router)
+  },
+
+  // ── Acompanhamento de pedido ──────────────────────────────────────────────
+
+  '/acompanhar': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new AcompanhamentoView(app)
+    return new AcompanhamentoController(view, router)
+  },
+
+  '/acompanhar/:id': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new AcompanhamentoView(app)
+    return new AcompanhamentoController(view, router)
+  },
+
+  // ── Pedidos do cliente ────────────────────────────────────────────────
+
+  '/pedido': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new PedidoView(app)
+    return new PedidoController(view, router)
+  },
+
+  '/meus-pedidos': () => {
+    if (!getToken()) {
+      router.navigate('/auth')
+      return { init() {}, destroy() {} }
+    }
+    const view = new MeusPedidosView(app)
+    return new MeusPedidosController(view, router)
+  },
+
+  // ── Pedidos do restaurante ────────────────────────────────────────────
+
+  '/restaurante/pedidos': () => {
+    if (!getRestauranteToken()) {
+      router.navigate('/restaurante/login')
+      return { init() {}, destroy() {} }
+    }
+    const view = new PedidosRestauranteView(app)
+    return new PedidosRestauranteController(view, router)
   },
 })
 
