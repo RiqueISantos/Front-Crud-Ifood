@@ -1,13 +1,13 @@
-/**
- * MeusPedidosView
- *
- * Lista de pedidos do usuário — fiel ao iFood.
- * Cada card mostra restaurante, status com cor, itens resumidos e total.
- * Rota: #/meus-pedidos
- */
+import { buildMapaAnimado, buildTrackerAc } from './AcompanhamentoView.js'
+
 
 export class MeusPedidosView {
-  constructor(container) { this._container = container }
+  constructor(container) {
+    this._container = container
+    this._animFrame = null
+    this._progress  = 0
+    this._direction = 1
+  }
 
   renderLoading() {
     this._container.innerHTML = /* html */`
@@ -41,6 +41,11 @@ export class MeusPedidosView {
   }
 
   renderDetalhe(pedido) {
+    const statusAtivo = !['ENTREGUE','CANCELADO'].includes(pedido.status)
+    const rest   = pedido.restaurante?.nome ?? ''
+    const end    = pedido.endereco
+    const endStr = end ? `${end.logradouro}, ${end.numero} — ${end.bairro}` : ''
+
     this._container.innerHTML = /* html */`
       <div class="mp-page">
         <header class="mp-header">
@@ -54,8 +59,15 @@ export class MeusPedidosView {
         </header>
 
         <div class="mp-content">
+
+          <!-- Mapa animado (só quando pedido está ativo) -->
+          ${statusAtivo ? /* html */`
+            <div class="ac-map" id="mp-mapa" style="height:200px;border-radius:12px;overflow:hidden;margin-bottom:12px">
+              ${buildMapaAnimado(rest, endStr)}
+            </div>` : ''}
+
           <!-- Status tracker -->
-          <div class="mp-tracker">
+          <div class="mp-tracker" id="mp-tracker-detalhe">
             ${_buildTracker(pedido.status)}
           </div>
 
@@ -121,6 +133,47 @@ export class MeusPedidosView {
         </div>
       </div>
     `
+  }
+
+  // ── Animação do mapa no detalhe ────────────────────────────────────────────
+
+  startMapAnimation() {
+    this._progress  = 0
+    this._direction = 1
+    const moto = document.getElementById('ac-moto')
+    const path = document.getElementById('ac-path')
+    if (!moto || !path) return
+    const totalLen = path.getTotalLength?.() ?? 300
+    const animate = () => {
+      this._progress += this._direction * 0.4
+      if (this._progress >= 100) { this._progress = 100; this._direction = -1 }
+      if (this._progress <= 0)   { this._progress = 0;   this._direction =  1 }
+      const pt = path.getPointAtLength?.((this._progress / 100) * totalLen)
+      if (pt) {
+        const scale = this._direction > 0 ? '1,1' : '-1,1'
+        moto.setAttribute('transform', `translate(${pt.x - 12}, ${pt.y - 12}) scale(${scale})`)
+      }
+      this._animFrame = requestAnimationFrame(animate)
+    }
+    this._animFrame = requestAnimationFrame(animate)
+  }
+
+  stopMapAnimation() {
+    if (this._animFrame) { cancelAnimationFrame(this._animFrame); this._animFrame = null }
+  }
+
+  updateDetalheStatus(status) {
+    const trackerEl = document.getElementById('mp-tracker-detalhe')
+    if (trackerEl) trackerEl.innerHTML = _buildTracker(status)
+    if (['ENTREGUE', 'CANCELADO'].includes(status)) {
+      this.stopMapAnimation()
+      const mapaEl = document.getElementById('mp-mapa')
+      if (mapaEl) {
+        mapaEl.innerHTML = status === 'ENTREGUE'
+          ? `<div class="ac-map__entregue"><div class="ac-map__entregue-icon">🎉</div><div class="ac-map__entregue-text">Pedido entregue!</div></div>`
+          : `<div class="ac-map__cancelado"><div class="ac-map__cancelado-icon">❌</div><div class="ac-map__cancelado-text">Pedido cancelado</div></div>`
+      }
+    }
   }
 
   // ── UI ─────────────────────────────────────────────────────────────────────

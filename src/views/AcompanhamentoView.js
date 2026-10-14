@@ -164,6 +164,16 @@ export class AcompanhamentoView {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+// ── Helpers exportados (usados também no MeusPedidosView) ────────────────────
+
+export function buildMapaAnimado(rest, endStr) {
+  return _buildMapa(rest, endStr)
+}
+
+export function buildTrackerAc(status) {
+  return _buildTracker(status)
+}
+
 function _buildMapa(rest, endStr) {
   return /* html */`
     <div class="ac-map__inner">

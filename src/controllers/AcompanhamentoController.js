@@ -1,19 +1,22 @@
 /**
  * AcompanhamentoController
  *
- * Tela de acompanhamento do pedido em tempo real.
- * Polling de 15s para atualizar status.
+ * Tela de acompanhamento do pedido em tempo real via SSE.
+ * O backend usa APScheduler para simular o avanço automático dos status.
  * Rota: #/acompanhar/:id
  */
 
-import { apiGetPedido } from '../services/api.js'
+import { apiGetPedido, getToken } from '../services/api.js'
+
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
 
 export class AcompanhamentoController {
   constructor(view, router) {
     this._view      = view
     this._router    = router
     this._pedido    = null
-    this._pollTimer = null
+    this._sse       = null   // EventSource
+    this._pollTimer = null   // fallback polling se SSE falhar
   }
 
   async init() {
@@ -29,10 +32,15 @@ export class AcompanhamentoController {
 
     this._view.render(this._pedido)
     this._bindEvents()
-    this._iniciarPolling()
+
+    // Só conecta SSE se o pedido ainda está em andamento
+    if (!['ENTREGUE', 'CANCELADO'].includes(this._pedido.status)) {
+      this._conectarSSE(id)
+    }
   }
 
   destroy() {
+    this._desconectarSSE()
     this._pararPolling()
     this._view.destroy?.()
   }
@@ -41,28 +49,72 @@ export class AcompanhamentoController {
     this._view.onVoltar(() => this._router.navigate('/meus-pedidos'))
   }
 
-  async _poll() {
+  // ── SSE ────────────────────────────────────────────────────────────────────
+
+  _conectarSSE(pedidoId) {
+    const token = getToken()
+    if (!token) return
+
+    const url = `${BASE_URL}/pedidos/${pedidoId}/acompanhar?token=${token}`
+
     try {
-      const atualizado = await apiGetPedido(this._pedido.id)
-      if (atualizado.status !== this._pedido.status) {
-        this._pedido = atualizado
-        this._view.updateStatus(atualizado.status)
+      this._sse = new EventSource(url)
+
+      this._sse.onmessage = (event) => {
+        try {
+          const dados = JSON.parse(event.data)
+          if (dados.status && dados.status !== this._pedido.status) {
+            this._pedido.status = dados.status
+            this._view.updateStatus(dados.status)
+
+            // Fecha SSE quando terminar
+            if (['ENTREGUE', 'CANCELADO'].includes(dados.status)) {
+              this._desconectarSSE()
+            }
+          }
+        } catch {}
       }
-      // Para o polling se chegou no status final
-      if (['ENTREGUE', 'CANCELADO'].includes(atualizado.status)) {
-        this._pararPolling()
+
+      this._sse.onerror = () => {
+        // SSE falhou — cai para polling como fallback
+        this._desconectarSSE()
+        this._iniciarPolling(pedidoId)
       }
-    } catch {}
+    } catch {
+      // EventSource não disponível — usa polling
+      this._iniciarPolling(pedidoId)
+    }
   }
 
-  _iniciarPolling() {
-    if (['ENTREGUE', 'CANCELADO'].includes(this._pedido.status)) return
-    this._pollTimer = setInterval(() => this._poll(), 15_000)
+  _desconectarSSE() {
+    if (this._sse) {
+      this._sse.close()
+      this._sse = null
+    }
+  }
+
+  // ── Polling fallback ───────────────────────────────────────────────────────
+
+  _iniciarPolling(pedidoId) {
+    this._pollTimer = setInterval(async () => {
+      try {
+        const atualizado = await apiGetPedido(pedidoId)
+        if (atualizado.status !== this._pedido.status) {
+          this._pedido.status = atualizado.status
+          this._view.updateStatus(atualizado.status)
+          if (['ENTREGUE', 'CANCELADO'].includes(atualizado.status)) {
+            this._pararPolling()
+          }
+        }
+      } catch {}
+    }, 10_000)
   }
 
   _pararPolling() {
     if (this._pollTimer) { clearInterval(this._pollTimer); this._pollTimer = null }
   }
+
+  // ── Helper ─────────────────────────────────────────────────────────────────
 
   _getIdFromHash() {
     const match = window.location.hash.match(/\/acompanhar\/(\d+)/)

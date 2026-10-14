@@ -2,11 +2,13 @@
  * MeusPedidosController
  *
  * Lista e detalha pedidos do usuário.
- * Polling de 30s para atualizar status quando tem pedido ativo.
+ * No detalhe: SSE para atualização em tempo real + mapa animado.
  * Rota: #/meus-pedidos
  */
 
-import { apiListarMeusPedidos, apiGetPedido, apiCancelarPedido } from '../services/api.js'
+import { apiListarMeusPedidos, apiGetPedido, apiCancelarPedido, getToken } from '../services/api.js'
+
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
 
 const STATUS_ATIVOS = [
   'AGUARDANDO_PAGAMENTO',
@@ -23,11 +25,11 @@ export class MeusPedidosController {
     this._pedidos   = []
     this._detalhe   = null
     this._pollTimer = null
+    this._sse       = null
   }
 
   async init() {
-    // Verifica se deve abrir detalhe diretamente
-    const hash = window.location.hash
+    const hash  = window.location.hash
     const match = hash.match(/\/meus-pedidos\/(\d+)/)
     if (match) {
       await this._carregarDetalhe(Number(match[1]))
@@ -41,6 +43,8 @@ export class MeusPedidosController {
 
   destroy() {
     this._pararPolling()
+    this._desconectarSSE()
+    this._view.stopMapAnimation?.()
   }
 
   // ── Lista ──────────────────────────────────────────────────────────────────
@@ -63,18 +67,30 @@ export class MeusPedidosController {
   // ── Detalhe ────────────────────────────────────────────────────────────────
 
   async _carregarDetalhe(id) {
+    this._desconectarSSE()
+    this._view.stopMapAnimation?.()
+
     try {
       this._detalhe = await apiGetPedido(id)
     } catch (err) {
       this._view.showToast(err.message || 'Erro ao carregar pedido.', 'error')
       return
     }
+
     this._view.renderDetalhe(this._detalhe)
     this._bindEventosDetalhe()
+
+    // Inicia animação e SSE se pedido ainda está ativo
+    if (STATUS_ATIVOS.includes(this._detalhe.status)) {
+      this._view.startMapAnimation?.()
+      this._conectarSSE(id)
+    }
   }
 
   _bindEventosDetalhe() {
     this._view.onVoltarDetalhe(() => {
+      this._desconectarSSE()
+      this._view.stopMapAnimation?.()
       this._detalhe = null
       this._view.renderLoading()
       this._carregarLista()
@@ -86,6 +102,8 @@ export class MeusPedidosController {
     this._view.setCancelLoading(true)
     try {
       await apiCancelarPedido(id)
+      this._desconectarSSE()
+      this._view.stopMapAnimation?.()
       this._view.showToast('Pedido cancelado.', 'success')
       setTimeout(() => {
         this._view.renderLoading()
@@ -98,7 +116,37 @@ export class MeusPedidosController {
     }
   }
 
-  // ── Polling ────────────────────────────────────────────────────────────────
+  // ── SSE ────────────────────────────────────────────────────────────────────
+
+  _conectarSSE(pedidoId) {
+    const token = getToken()
+    if (!token) return
+
+    try {
+      this._sse = new EventSource(`${BASE_URL}/pedidos/${pedidoId}/acompanhar?token=${token}`)
+
+      this._sse.onmessage = (event) => {
+        try {
+          const dados = JSON.parse(event.data)
+          if (dados.status && this._detalhe && dados.status !== this._detalhe.status) {
+            this._detalhe.status = dados.status
+            this._view.updateDetalheStatus?.(dados.status)
+            if (['ENTREGUE', 'CANCELADO'].includes(dados.status)) {
+              this._desconectarSSE()
+            }
+          }
+        } catch {}
+      }
+
+      this._sse.onerror = () => this._desconectarSSE()
+    } catch {}
+  }
+
+  _desconectarSSE() {
+    if (this._sse) { this._sse.close(); this._sse = null }
+  }
+
+  // ── Polling (na lista) ─────────────────────────────────────────────────────
 
   _iniciarPolling() {
     this._pollTimer = setInterval(async () => {
