@@ -786,3 +786,39 @@
     padding: 72px 16px 32px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVIDADE ADICIONAL — NOTEBOOK / DESKTOP
+   ══════════════════════════════════════════════════════════════ */
+
+/* Notebook 1024-1280px — painel direito mais estreito */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .rest-landing-right {
+    width: 400px;
+    padding: 48px 32px;
+  }
+  .rest-landing-headline { font-size: 2rem; }
+  .rest-landing-logo__text { font-size: 1.9rem; }
+  .rest-panel--wide { width: 460px; }
+  .rest-panel        { width: 400px; }
+}
+
+/* Notebook 960-1023px */
+@media (min-width: 960px) and (max-width: 1023px) {
+  .rest-landing-right {
+    width: 360px;
+    padding: 40px 24px;
+  }
+  .rest-landing-headline { font-size: 1.8rem; }
+  .rest-panel--wide { width: 400px; }
+  .rest-panel        { width: 360px; }
+}
+
+/* Largura máxima do conteúdo dos formulários */
+@media (min-width: 960px) {
+  .rest-dados-page .rest-form-page,
+  .rest-endereco-page .rest-form-page {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+}

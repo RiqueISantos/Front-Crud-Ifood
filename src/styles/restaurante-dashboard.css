@@ -643,3 +643,64 @@
 @media (max-width: 400px) {
   .rdash-metrics-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVIDADE ADICIONAL — NOTEBOOK / DESKTOP WIDE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Notebook grande e monitores wide — limitar largura do conteúdo */
+@media (min-width: 1280px) {
+  .rdash-content {
+    max-width: 1400px;
+    padding: 32px 40px;
+  }
+  .rdash-metrics-grid {
+    grid-template-columns: repeat(4, minmax(0, 280px));
+  }
+  .rdash-actions-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .rdash-two-col {
+    grid-template-columns: 1fr 1fr;
+    max-width: 1200px;
+  }
+  /* Fontes mínimas legíveis */
+  .rdash-sidebar__logo-sub,
+  .rdash-nav-section {
+    font-size: 0.72rem;
+  }
+  .rdash-status-badge { font-size: 0.72rem; }
+}
+
+/* Notebook médio 1024-1280px */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .rdash-sidebar { width: 220px; }
+  .rdash-main    { margin-left: 220px; }
+  .rdash-content { padding: 24px 28px; }
+  .rdash-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .rdash-actions-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Tablet 768-1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .rdash-sidebar {
+    width: 64px;
+    overflow: hidden;
+  }
+  .rdash-sidebar__rest,
+  .rdash-nav-item span:not(.rdash-nav-item__icon),
+  .rdash-sidebar__logo-sub,
+  .rdash-logout-btn span:last-child,
+  .rdash-nav-section {
+    display: none;
+  }
+  .rdash-nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .rdash-main { margin-left: 64px; }
+  .rdash-content { padding: 20px; }
+  .rdash-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .rdash-actions-grid { grid-template-columns: repeat(3, 1fr); }
+  .rdash-two-col { grid-template-columns: 1fr; }
+}

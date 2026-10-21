@@ -407,3 +407,30 @@
   padding: 0;
 }
 .cadastro-entrar-link:hover { opacity: 0.8; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVIDADE ADICIONAL — NOTEBOOK
+   ══════════════════════════════════════════════════════════════ */
+
+/* Notebook 900-1440px — aproveita melhor a tela */
+@media (min-width: 900px) and (max-width: 1440px) {
+  .auth-page,
+  .email-input-page {
+    gap: 60px;
+  }
+  .auth-illustration {
+    max-width: 420px;
+  }
+  .auth-panel,
+  .email-input-panel {
+    width: 440px;
+    padding: 40px;
+  }
+}
+
+/* Desktop wide 1440px+ */
+@media (min-width: 1440px) {
+  .auth-illustration { max-width: 520px; }
+  .auth-panel,
+  .email-input-panel { width: 480px; }
+}

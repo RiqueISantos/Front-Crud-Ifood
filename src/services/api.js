@@ -508,3 +508,61 @@ export async function apiRemoverItemSacola(itemId) {
 export async function apiLimparSacola() {
   return request('/sacola', { method: 'DELETE' })
 }
+
+// ── Endpoints de Pedido ────────────────────────────────────────────────────
+
+/**
+ * Confirma o pedido convertendo a sacola.
+ * @param {{ endereco_id, forma_pagamento, observacao? }} data
+ */
+export async function apiConfirmarPedido(data) {
+  return request('/pedidos/confirmar', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+/**
+ * Lista todos os pedidos do usuário autenticado.
+ */
+export async function apiListarMeusPedidos() {
+  return request('/pedidos/meus')
+}
+
+/**
+ * Busca detalhes de um pedido.
+ * @param {number} pedidoId
+ */
+export async function apiGetPedido(pedidoId) {
+  return request(`/pedidos/${pedidoId}`)
+}
+
+/**
+ * Cancela um pedido.
+ * @param {number} pedidoId
+ */
+export async function apiCancelarPedido(pedidoId) {
+  return request(`/pedidos/${pedidoId}/cancelar`, { method: 'PATCH' })
+}
+
+/**
+ * Lista pedidos do restaurante autenticado.
+ */
+export async function apiListarPedidosRestaurante() {
+  return requestRest('/pedidos/restaurante')
+}
+
+/**
+ * Avança o status de um pedido (uso do restaurante).
+ * @param {number} pedidoId
+ */
+export async function apiAvancarStatusPedido(pedidoId) {
+  return requestRest(`/pedidos/${pedidoId}/status`, { method: 'PATCH' })
+}
+
+/**
+ * Retorna os status e formas de pagamento disponíveis.
+ */
+export async function apiOpcoesStatus() {
+  return request('/pedidos/status/opcoes')
+}

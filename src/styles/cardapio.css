@@ -343,3 +343,53 @@
   .cdp-btn-primary,
   .cdp-btn-outline { width: 100%; text-align: center; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVIDADE ADICIONAL — NOTEBOOK / TABLET
+   ══════════════════════════════════════════════════════════════ */
+
+/* Notebook largo — mais colunas */
+@media (min-width: 1280px) {
+  .cdp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .cdp-page {
+    padding: 32px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* Notebook médio */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .cdp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .cdp-page { padding: 24px 28px; }
+}
+
+/* Tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .cdp-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .cdp-page { padding: 16px 20px; }
+  .cdp-card__status { font-size: 0.72rem; }
+}
+
+/* Mobile */
+@media (max-width: 639px) {
+  .cdp-grid {
+    grid-template-columns: 1fr;
+  }
+  .cdp-topbar {
+    padding: 0 16px;
+  }
+  .cdp-fab {
+    bottom: 16px;
+    right: 16px;
+  }
+}
