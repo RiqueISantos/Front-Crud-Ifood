@@ -17,8 +17,31 @@ export class PedidoController {
     this._enderecos = []
   }
 
+  // ── Notificação do navegador ────────────────────────────────────────────────
+
+  _solicitarPermissaoNotificacao() {
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }
+
+  _notificarPedidoRealizado(pedido) {
+    if (!('Notification' in window)) return
+    if (Notification.permission !== 'granted') return
+
+    new Notification('✅ Pedido realizado com sucesso!', {
+      body: `Pedido #${pedido.id} recebido. Aguardando confirmação do restaurante.`,
+      icon: '/favicon.svg',
+      tag : `pedido-confirmado-${pedido.id}`,
+    })
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+
   async init() {
     this._view.renderLoading()
+    this._solicitarPermissaoNotificacao()
 
     // Pega sacola do singleton global
     const sacolaCtrl = window._sacola
@@ -71,6 +94,9 @@ export class PedidoController {
 
       // Atualiza a sacola (foi limpa pelo backend)
       await window._sacola?.recarregar?.()
+
+      // Notifica o cliente que o pedido foi recebido
+      this._notificarPedidoRealizado(pedido)
 
       // Salva pedido para a tela de sucesso
       sessionStorage.setItem('ultimo_pedido', JSON.stringify(pedido))
