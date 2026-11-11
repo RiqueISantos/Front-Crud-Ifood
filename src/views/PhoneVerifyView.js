@@ -198,9 +198,14 @@ export class PhoneVerifyView {
   }
 
   fillCodeRandom() {
-    if (!import.meta.env.DEV) return
-    document.querySelectorAll('.verify-code-digit').forEach(i => {
-      i.value = String(Math.floor(Math.random() * 10))
+    // Não preenche automaticamente — o usuário deve digitar o código recebido
+    // (ou ver o código no console do servidor em modo DEV)
+  }
+
+  fillCode(codigo) {
+    const digits = String(codigo).replace(/\D/g, '').slice(0, 6).split('')
+    document.querySelectorAll('.verify-code-digit').forEach((input, i) => {
+      input.value = digits[i] ?? ''
     })
   }
 

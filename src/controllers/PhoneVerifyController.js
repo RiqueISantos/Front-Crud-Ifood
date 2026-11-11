@@ -81,15 +81,17 @@ export class PhoneVerifyController {
     this._view.setSendLoading(true)
     try {
       // Tenta primeiro como login
-      await apiRequestLoginCode({ identificador: this._phone, canal: 'sms' })
+      const loginRes = await apiRequestLoginCode({ identificador: this._phone, canal: 'sms' })
       this._mode = 'login'
+      if (loginRes?.codigo_dev) this._view.fillCode(loginRes.codigo_dev)
     } catch (loginErr) {
       const msg = loginErr.message ?? ''
       if (msg.toLowerCase().includes('não encontrado') || msg.toLowerCase().includes('nao encontrado')) {
         // Número novo → fluxo de cadastro
         try {
-          await sendSmsCode(this._phone)
+          const smsRes = await sendSmsCode(this._phone)
           this._mode = 'register'
+          if (smsRes?.codigo_dev) this._view.fillCode(smsRes.codigo_dev)
         } catch (registerErr) {
           const regMsg = registerErr.message ?? ''
           this._view.showToast(regMsg || 'Erro ao enviar o código.', 'error')

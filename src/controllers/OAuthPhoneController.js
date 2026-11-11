@@ -94,7 +94,9 @@ export class OAuthPhoneController {
       this._view.setPhoneSentDisplay(display)
       this._view.showStep(2)
       this._view.clearCodeInputs()
-      this._view.fillCodeRandom()
+      if (data.codigo_dev) {
+        this._view.fillCode(data.codigo_dev)
+      }
       this._view.focusFirstCode()
     } catch (e) {
       this._view.showToast(e.message || 'Erro ao enviar código.', 'error')
