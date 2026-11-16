@@ -687,3 +687,36 @@
   .ac-map { height: 180px; }
   .ac-info__value { font-size: .82rem; }
 }
+
+/* ── Tipo de Entrega ──────────────────────────────────────────────────────── */
+.pd-tipo-entrega {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.pd-tipo-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border: 2px solid var(--pd-border);
+  border-radius: 12px; cursor: pointer; transition: border-color .2s, background .2s;
+  background: #fff;
+}
+.pd-tipo-card input[type="radio"] { display: none; }
+
+.pd-tipo-card--selected {
+  border-color: var(--pd-red); background: #fff5f5;
+}
+
+.pd-tipo-card__icon {
+  font-size: 1.5rem; width: 36px; text-align: center; flex-shrink: 0;
+}
+.pd-tipo-card__info { flex: 1; }
+.pd-tipo-card__label {
+  font-size: .95rem; font-weight: 600; color: var(--pd-text);
+}
+.pd-tipo-card__desc {
+  font-size: .8rem; color: var(--pd-sub); margin-top: 2px;
+}
+.pd-tipo-card__check {
+  color: var(--pd-red); font-weight: bold; font-size: 1rem;
+  opacity: 0; transition: opacity .2s;
+}
+.pd-tipo-card--selected .pd-tipo-card__check { opacity: 1; }

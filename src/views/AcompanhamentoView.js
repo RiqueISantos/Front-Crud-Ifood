@@ -15,11 +15,12 @@ export class AcompanhamentoView {
   }
 
   render(pedido) {
-    const status    = pedido.status
-    const rest      = pedido.restaurante?.nome ?? 'Restaurante'
-    const end       = pedido.endereco
-    const endStr    = end ? `${end.logradouro}, ${end.numero} — ${end.bairro}` : 'Seu endereço'
-    const total     = `R$ ${Number(pedido.total).toFixed(2).replace('.', ',')}`
+    const status      = pedido.status
+    const rest        = pedido.restaurante?.nome ?? 'Restaurante'
+    const end         = pedido.endereco
+    const endStr      = end ? `${end.logradouro}, ${end.numero} — ${end.bairro}` : 'Seu endereço'
+    const total       = `R$ ${Number(pedido.total).toFixed(2).replace('.', ',')}`
+    const isRetirada  = pedido.tipo_entrega === 'RETIRADA'
     const isCancelado = status === 'CANCELADO'
     const isEntregue  = status === 'ENTREGUE'
 
@@ -40,12 +41,12 @@ export class AcompanhamentoView {
 
         <!-- Mapa animado -->
         <div class="ac-map" id="ac-map">
-          ${isCancelado ? _buildCancelado() : isEntregue ? _buildEntregue() : _buildMapa(rest, endStr)}
+          ${isCancelado ? _buildCancelado() : isEntregue ? _buildEntregue(isRetirada) : isRetirada ? _buildMapaRetirada(rest) : _buildMapa(rest, endStr)}
         </div>
 
         <!-- Status tracker -->
         <div class="ac-tracker">
-          ${_buildTracker(status)}
+          ${_buildTracker(status, isRetirada)}
         </div>
 
         <!-- Info do pedido -->
@@ -58,10 +59,10 @@ export class AcompanhamentoView {
             </div>
           </div>
           <div class="ac-info__end">
-            <span class="ac-info__icon">📍</span>
+            <span class="ac-info__icon">${isRetirada ? '🏃' : '📍'}</span>
             <div>
-              <div class="ac-info__label">Entrega em</div>
-              <div class="ac-info__value">${endStr}</div>
+              <div class="ac-info__label">${isRetirada ? 'Retirada no local' : 'Entrega em'}</div>
+              <div class="ac-info__value">${isRetirada ? rest : endStr}</div>
             </div>
           </div>
           <div class="ac-info__pgto">
@@ -89,19 +90,23 @@ export class AcompanhamentoView {
     `
 
     if (!isCancelado && !isEntregue) {
-      this._startAnimation()
+      this._startAnimation(isRetirada)
     }
+
+    // Guarda tipo para uso no updateStatus
+    this._isRetirada = isRetirada
   }
 
   updateStatus(status) {
-    const trackerEl = this._container.querySelector('.ac-tracker')
-    if (trackerEl) trackerEl.innerHTML = _buildTracker(status)
+    const isRetirada = this._isRetirada ?? false
+    const trackerEl  = this._container.querySelector('.ac-tracker')
+    if (trackerEl) trackerEl.innerHTML = _buildTracker(status, isRetirada)
 
     if (status === 'ENTREGUE' || status === 'CANCELADO') {
       this._stopAnimation()
       const mapEl = document.getElementById('ac-map')
       if (mapEl) {
-        mapEl.innerHTML = status === 'ENTREGUE' ? _buildEntregue() : _buildCancelado()
+        mapEl.innerHTML = status === 'ENTREGUE' ? _buildEntregue(isRetirada) : _buildCancelado()
       }
     }
   }
@@ -125,7 +130,7 @@ export class AcompanhamentoView {
 
   // ── Animação da moto ──────────────────────────────────────────────────────
 
-  _startAnimation() {
+  _startAnimation(isRetirada = false) {
     this._progress  = 0
     this._direction = 1
     const moto      = document.getElementById('ac-moto')
@@ -135,14 +140,12 @@ export class AcompanhamentoView {
     const totalLen = path.getTotalLength?.() ?? 300
 
     const animate = () => {
-      this._progress += this._direction * 0.4
+      this._progress += this._direction * (isRetirada ? 0.6 : 0.4)
       if (this._progress >= 100) { this._progress = 100; this._direction = -1 }
       if (this._progress <= 0)   { this._progress = 0;   this._direction =  1 }
 
       const pt = path.getPointAtLength?.((this._progress / 100) * totalLen)
       if (pt && moto) {
-        moto.setAttribute('transform', `translate(${pt.x - 12}, ${pt.y - 12})`)
-        // Vira a moto dependendo da direção
         const scale = this._direction > 0 ? '1,1' : '-1,1'
         moto.setAttribute('transform',
           `translate(${pt.x - 12}, ${pt.y - 12}) scale(${scale})`)
@@ -170,8 +173,8 @@ export function buildMapaAnimado(rest, endStr) {
   return _buildMapa(rest, endStr)
 }
 
-export function buildTrackerAc(status) {
-  return _buildTracker(status)
+export function buildTrackerAc(status, isRetirada = false) {
+  return _buildTracker(status, isRetirada)
 }
 
 function _buildMapa(rest, endStr) {
@@ -233,11 +236,11 @@ function _buildMapa(rest, endStr) {
   `
 }
 
-function _buildEntregue() {
+function _buildEntregue(isRetirada = false) {
   return /* html */`
     <div class="ac-map__entregue">
-      <div class="ac-map__entregue-icon">🎉</div>
-      <div class="ac-map__entregue-text">Pedido entregue!</div>
+      <div class="ac-map__entregue-icon">${isRetirada ? '🏃' : '🎉'}</div>
+      <div class="ac-map__entregue-text">${isRetirada ? 'Pedido retirado!' : 'Pedido entregue!'}</div>
     </div>
   `
 }
@@ -251,14 +254,62 @@ function _buildCancelado() {
   `
 }
 
-function _buildTracker(status) {
-  const steps = [
-    { key: 'AGUARDANDO_CONFIRMACAO', label: 'Confirmação', icon: '🕐' },
-    { key: 'CONFIRMADO',             label: 'Confirmado',  icon: '✅' },
-    { key: 'EM_PREPARACAO',          label: 'Em preparo',  icon: '👨‍🍳' },
-    { key: 'SAIU_PARA_ENTREGA',      label: 'A caminho',   icon: '🛵' },
-    { key: 'ENTREGUE',               label: 'Entregue',    icon: '🎉' },
-  ]
+function _buildMapaRetirada(rest) {
+  return /* html */`
+    <div class="ac-map__inner">
+      <svg class="ac-map__svg" viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg">
+        <rect width="380" height="220" fill="#e8f0e8"/>
+        <rect x="20"  y="20"  width="60" height="40" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="100" y="15"  width="80" height="50" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="200" y="20"  width="70" height="35" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="290" y="15"  width="70" height="45" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="20"  y="130" width="50" height="60" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="90"  y="140" width="90" height="50" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="200" y="130" width="60" height="55" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="280" y="140" width="80" height="50" rx="4" fill="#c8d8c8" opacity=".6"/>
+        <rect x="0"   y="80"  width="380" height="18" fill="#fff" opacity=".9"/>
+        <rect x="80"  y="0"   width="18"  height="220" fill="#fff" opacity=".9"/>
+        <rect x="180" y="0"   width="18"  height="220" fill="#fff" opacity=".9"/>
+        <rect x="270" y="0"   width="18"  height="220" fill="#fff" opacity=".9"/>
+        <rect x="0"   y="120" width="380" height="18"  fill="#fff" opacity=".9"/>
+
+        <!-- Rota circular em volta do restaurante -->
+        <path id="ac-path"
+          d="M 189,89 L 279,89 L 279,129 L 189,129 L 189,89"
+          fill="none" stroke="#ea1d2c" stroke-width="4"
+          stroke-dasharray="8,4" stroke-linecap="round" opacity=".85"/>
+
+        <!-- Restaurante no centro -->
+        <circle cx="189" cy="109" r="16" fill="#ea1d2c"/>
+        <text x="189" y="114" text-anchor="middle" font-size="14" fill="white">🏪</text>
+
+        <!-- Pessoa animada -->
+        <g id="ac-moto" transform="translate(177, 77)">
+          <text font-size="20">🏃</text>
+        </g>
+      </svg>
+      <div class="ac-map__from">🏪 ${rest}</div>
+      <div class="ac-map__to">🏃 Retire no balcão</div>
+    </div>
+  `
+}
+
+function _buildTracker(status, isRetirada = false) {
+  const steps = isRetirada
+    ? [
+        { key: 'AGUARDANDO_CONFIRMACAO', label: 'Confirmação',       icon: '🕐' },
+        { key: 'CONFIRMADO',             label: 'Confirmado',         icon: '✅' },
+        { key: 'EM_PREPARACAO',          label: 'Em preparo',         icon: '👨‍🍳' },
+        { key: 'SAIU_PARA_ENTREGA',      label: 'Pronto p/ retirada', icon: '🔔' },
+        { key: 'ENTREGUE',               label: 'Retirado',           icon: '🏃' },
+      ]
+    : [
+        { key: 'AGUARDANDO_CONFIRMACAO', label: 'Confirmação', icon: '🕐' },
+        { key: 'CONFIRMADO',             label: 'Confirmado',  icon: '✅' },
+        { key: 'EM_PREPARACAO',          label: 'Em preparo',  icon: '👨‍🍳' },
+        { key: 'SAIU_PARA_ENTREGA',      label: 'A caminho',   icon: '🛵' },
+        { key: 'ENTREGUE',               label: 'Entregue',    icon: '🎉' },
+      ]
   const order = steps.map(s => s.key)
   const idx   = order.indexOf(status)
 

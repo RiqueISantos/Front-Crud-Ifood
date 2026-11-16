@@ -73,8 +73,33 @@ export class PedidoView {
             </div>
           </div>
 
-          <!-- Endereço de entrega -->
+          <!-- Tipo de entrega -->
           <div class="pd-section">
+            <div class="pd-section__title">Como quer receber?</div>
+            <div class="pd-tipo-entrega" id="pd-tipo-entrega">
+              <label class="pd-tipo-card pd-tipo-card--selected" data-tipo="ENTREGA">
+                <input type="radio" name="tipo_entrega" value="ENTREGA" checked>
+                <span class="pd-tipo-card__icon">🛵</span>
+                <div class="pd-tipo-card__info">
+                  <div class="pd-tipo-card__label">Entrega</div>
+                  <div class="pd-tipo-card__desc">Receber em casa${taxa > 0 ? ` · R$ ${taxa.toFixed(2).replace('.', ',')}` : ' · Grátis'}</div>
+                </div>
+                <span class="pd-tipo-card__check">✓</span>
+              </label>
+              <label class="pd-tipo-card" data-tipo="RETIRADA">
+                <input type="radio" name="tipo_entrega" value="RETIRADA">
+                <span class="pd-tipo-card__icon">🏃</span>
+                <div class="pd-tipo-card__info">
+                  <div class="pd-tipo-card__label">Retirada</div>
+                  <div class="pd-tipo-card__desc">Buscar no restaurante · Grátis</div>
+                </div>
+                <span class="pd-tipo-card__check">✓</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Endereço de entrega (oculto em RETIRADA) -->
+          <div class="pd-section" id="pd-section-endereco">
             <div class="pd-section__title">Endereço de entrega</div>
             ${enderecos.length === 0
               ? /* html */`
@@ -129,18 +154,18 @@ export class PedidoView {
           </div>
 
           <!-- Totais -->
-          <div class="pd-section pd-totais">
+          <div class="pd-section pd-totais" id="pd-totais">
             <div class="pd-totais__linha">
               <span>Subtotal</span>
               <span>R$ ${sub.toFixed(2).replace('.', ',')}</span>
             </div>
-            <div class="pd-totais__linha">
+            <div class="pd-totais__linha" id="pd-linha-taxa">
               <span>Taxa de entrega</span>
-              <span>${taxa > 0 ? `R$ ${taxa.toFixed(2).replace('.', ',')}` : 'Grátis'}</span>
+              <span id="pd-taxa-valor">${taxa > 0 ? `R$ ${taxa.toFixed(2).replace('.', ',')}` : 'Grátis'}</span>
             </div>
             <div class="pd-totais__linha pd-totais__linha--total">
               <span>Total</span>
-              <span>R$ ${total.toFixed(2).replace('.', ',')}</span>
+              <span id="pd-total-valor">R$ ${total.toFixed(2).replace('.', ',')}</span>
             </div>
           </div>
 
@@ -150,13 +175,45 @@ export class PedidoView {
 
         <!-- Botão fixo -->
         <div class="pd-footer">
-          <button class="pd-btn-confirmar" id="btn-pd-confirmar">
+          <button class="pd-btn-confirmar" id="btn-pd-confirmar" data-label="Fazer pedido · R$ ${total.toFixed(2).replace('.', ',')}">
             <span id="btn-pd-confirmar-text">Fazer pedido · R$ ${total.toFixed(2).replace('.', ',')}</span>
           </button>
         </div>
 
       </div>
     `
+
+    this._bindTipoEntrega(sub, taxa)
+  }
+
+  _bindTipoEntrega(sub, taxa) {
+    const cards   = document.querySelectorAll('.pd-tipo-card')
+    const secEnd  = document.getElementById('pd-section-endereco')
+    const taxaEl  = document.getElementById('pd-taxa-valor')
+    const totalEl = document.getElementById('pd-total-valor')
+    const btnText = document.getElementById('btn-pd-confirmar-text')
+    const btn     = document.getElementById('btn-pd-confirmar')
+
+    const atualizar = (tipo) => {
+      // Destaque visual nos cards
+      cards.forEach(c => c.classList.toggle('pd-tipo-card--selected', c.dataset.tipo === tipo))
+
+      // Mostra/oculta seção de endereço
+      if (secEnd) secEnd.style.display = tipo === 'ENTREGA' ? '' : 'none'
+
+      // Recalcula taxa e total
+      const taxaAtual = tipo === 'ENTREGA' ? taxa : 0
+      const totalAtual = sub + taxaAtual
+      if (taxaEl)  taxaEl.textContent  = taxaAtual > 0 ? `R$ ${taxaAtual.toFixed(2).replace('.', ',')}` : 'Grátis'
+      if (totalEl) totalEl.textContent = `R$ ${totalAtual.toFixed(2).replace('.', ',')}`
+      const label = `Fazer pedido · R$ ${totalAtual.toFixed(2).replace('.', ',')}`
+      if (btnText) btnText.textContent = label
+      if (btn)     btn.dataset.label   = label
+    }
+
+    document.querySelectorAll('input[name="tipo_entrega"]').forEach(radio => {
+      radio.addEventListener('change', e => atualizar(e.target.value))
+    })
   }
 
   renderSucesso(pedido) {
@@ -190,6 +247,10 @@ export class PedidoView {
 
   getEnderecoId() {
     return Number(document.querySelector('input[name="endereco"]:checked')?.value ?? 0)
+  }
+
+  getTipoEntrega() {
+    return document.querySelector('input[name="tipo_entrega"]:checked')?.value ?? 'ENTREGA'
   }
 
   getFormaPagamento() {

@@ -75,22 +75,26 @@ export class PedidoController {
   }
 
   async _handleConfirmar() {
+    const tipoEntrega    = this._view.getTipoEntrega()
     const enderecoId     = this._view.getEnderecoId()
     const formaPagamento = this._view.getFormaPagamento()
     const observacao     = this._view.getObservacao()
 
-    if (!enderecoId) {
+    if (tipoEntrega === 'ENTREGA' && !enderecoId) {
       this._view.showToast('Selecione um endereço de entrega.', 'error')
       return
     }
 
     this._view.setConfirmarLoading(true)
     try {
-      const pedido = await apiConfirmarPedido({
-        endereco_id:     enderecoId,
+      const payload = {
+        tipo_entrega:    tipoEntrega,
         forma_pagamento: formaPagamento,
         observacao:      observacao || undefined,
-      })
+      }
+      if (tipoEntrega === 'ENTREGA') payload.endereco_id = enderecoId
+
+      const pedido = await apiConfirmarPedido(payload)
 
       // Atualiza a sacola (foi limpa pelo backend)
       await window._sacola?.recarregar?.()
