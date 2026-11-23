@@ -62,7 +62,7 @@ export class PedidosRestauranteController {
   }
 
   _iniciarPolling() {
-    this._pollTimer = setInterval(() => this._carregar(), 20_000)
+    this._pollTimer = setInterval(() => this._carregar(), 5_000)
   }
 
   _pararPolling() {

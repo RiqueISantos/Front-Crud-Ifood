@@ -139,7 +139,7 @@ function _buildHeader() {
 }
 
 function _buildCard(p, colKey) {
-  const podAvancar = !['ENTREGUE','CANCELADO','AGUARDANDO_PAGAMENTO'].includes(colKey)
+  const podAvancar = !['ENTREGUE','CANCELADO','AGUARDANDO_PAGAMENTO','SAIU_PARA_ENTREGA'].includes(colKey)
   const primeiros  = p.itens.slice(0, 2).map(i => `${i.quantidade}× ${i.nome_produto}`).join(', ')
   const resto      = p.itens.length > 2 ? ` +${p.itens.length - 2}` : ''
   return /* html */`
@@ -168,10 +168,9 @@ function _buildCard(p, colKey) {
 
 function _labelAvancar(status) {
   const map = {
-    AGUARDANDO_CONFIRMACAO: 'Confirmar pedido',
-    CONFIRMADO:             'Iniciar preparo',
-    EM_PREPARACAO:          'Enviar para entrega',
-    SAIU_PARA_ENTREGA:      'Marcar entregue',
+    AGUARDANDO_CONFIRMACAO: '✅ Aceitar pedido',
+    CONFIRMADO:             '👨‍🍳 Iniciar preparo',
+    EM_PREPARACAO:          '🛵 Enviar para entrega',
   }
   return map[status] ?? 'Avançar'
 }

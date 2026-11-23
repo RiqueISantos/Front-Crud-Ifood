@@ -56,6 +56,16 @@ export class RestauranteEmailController {
     this._view.setEmailLoading(true)
 
     try {
+      // Em DEV pula o envio de e-mail e vai direto para o passo 2
+      if (import.meta.env.DEV) {
+        this._view.setOtpEmailDisplay(email)
+        this._view.showStep(2)
+        this._view.clearOtpInputs()
+        this._view.fillOtpRandom()
+        this._view.focusFirstOtp()
+        return
+      }
+
       await apiRestauranteSolicitarCadastro(email)
       this._view.setOtpEmailDisplay(email)
       this._view.showStep(2)

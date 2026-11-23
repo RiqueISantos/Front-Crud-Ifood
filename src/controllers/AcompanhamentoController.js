@@ -33,9 +33,10 @@ export class AcompanhamentoController {
     this._view.render(this._pedido)
     this._bindEvents()
 
-    // Só conecta SSE se o pedido ainda está em andamento
+    // Só conecta SSE e polling se o pedido ainda está em andamento
     if (!['ENTREGUE', 'CANCELADO'].includes(this._pedido.status)) {
       this._conectarSSE(id)
+      this._iniciarPolling(id) // polling de 5s garantido independente do SSE
     }
   }
 
@@ -76,9 +77,8 @@ export class AcompanhamentoController {
       }
 
       this._sse.onerror = () => {
-        // SSE falhou — cai para polling como fallback
+        // SSE falhou — polling já está rodando como fallback
         this._desconectarSSE()
-        this._iniciarPolling(pedidoId)
       }
     } catch {
       // EventSource não disponível — usa polling
@@ -96,6 +96,7 @@ export class AcompanhamentoController {
   // ── Polling fallback ───────────────────────────────────────────────────────
 
   _iniciarPolling(pedidoId) {
+    if (this._pollTimer) return // já está rodando
     this._pollTimer = setInterval(async () => {
       try {
         const atualizado = await apiGetPedido(pedidoId)
@@ -104,10 +105,11 @@ export class AcompanhamentoController {
           this._view.updateStatus(atualizado.status)
           if (['ENTREGUE', 'CANCELADO'].includes(atualizado.status)) {
             this._pararPolling()
+            this._desconectarSSE()
           }
         }
       } catch {}
-    }, 10_000)
+    }, 5_000)
   }
 
   _pararPolling() {
